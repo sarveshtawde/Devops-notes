@@ -1,0 +1,66 @@
+---------#GS-----------Linux commands------------#SG-----------------------
+
+1) mkdir <name_of_folder> ----->used to create new directory
+2) chmod 777 <name_of_folder>  ----> used to provide permissions
+3) useradd <user_name eg:non-root> --------> to add user 
+4) chown <user_name eg:non-root>:<user_name eg:non-root> <name_of_folder> ----> change user for directory
+5) passwd <name of folder>  ------------> change password of user
+6) ssh name_of_user@<server_ip> --------------->login_into_server_using_created_user
+7) touch <name of file with extension>  --------------> create new file
+8) date  -------------> to check current date
+9) cal ------------->calender
+10) vi <file_name> ---------------> to edit inside file
+11) pwd  -------------> used to check present working directory
+12) df -h --------> used to check disk of server
+13) mv <complete path with file name(source)> <destination>  ----------> move file from one path to another
+14) cp <complete path with file name(source)> <destination>   ---------> copy file from one path to another
+15) stat <file_name> --------->it shows details of the file
+16) sort <file_name> -----------> short alphabetically inside file
+17) head -n 3 <file_name> -------------> displays first 3 lines of file
+18) tail -n 3 <file_name> -------------> displays last 3 lines of file
+19) alias  a='command u want to create shortcut' ---------->create shortcuts of long commands
+20) whoami  -----------> check the user
+21) ls -----------> list short 
+22) ll ------------> list long
+23) cd  --------> change directory
+24) what is <docker>  ---------> one line information
+25)clear /ctl+L ----------> to clear screen
+26) id  ----------->uid=1008(MSD) gid=1009(MSD) groups=1009(MSD)
+27) --help ---------------> it will show additional parameters related to that command
+28) rm <file_name> -----------> remove file
+29) rmdir <name of directoy> ----------> remove directory
+30) cat <file_name> ----------> is used to display the information in the file
+31) free -h ------------> to check free cpu,ram and disk 
+32) userdel <user name> -------------> delete user by firing command through root user
+
+
+
+Q1. How do you check the running processes and system load?
+A: Use top or htop for real-time, dynamic monitoring of CPU, memory, and running processes. Use ps aux to view a static snapshot of all processes.
+
+Q2. How do you check if a service is running and restart it?
+A: Use systemctl status <service_name> to check the status. Use systemctl restart <service_name> to restart it. (Also acceptable: older service <service_name> status/restart).
+
+Q3. How do you monitor logs in real-time?
+A: Use the command tail -f /var/log/application.log (or relevant path). The -f flag stands for "follow," which streams the newest lines written to the file as they occur.
+
+Q4. What is the difference between df and du?
+A: df -h (disk filesystem) shows the disk usage of the mounted filesystems (partitions). du -sh /path/ (disk usage) shows the disk usage of a specific directory or file. -h makes the output human-readable.
+
+Q5. Explain the importance of file permissions (CHMOD).
+A: File permissions (read r=4, write w=2, execute x=1) control which User, Group, and Others can interact with a file. Permissions like 755 mean User has all access (4+2+1=7), and Group/Others have read/execute (4+1=5).
+
+Q6. How do you find which process is listening on a specific port?
+A: Use the command sudo lsof -i :<port_number> or sudo netstat -tulnp | grep :<port_number>. This is essential for troubleshooting "address already in use" errors.
+
+Q7. What is an INODE?
+A: An INODE (Index Node) is a data structure on a Linux filesystem that stores metadata about a file or directory (owner, permissions, size, creation time, disk block locations). When you run out of inodes, you cannot create new files, even if disk space is available.
+
+Q8. What is a "soft link" (symlink)?
+A: A soft link (created with ln -s) is an alias or shortcut to a file or directory. It points to the original file's pathname. If the original file is deleted, the soft link breaks and points to nothing.
+
+Q9. How do you find a specific file or command on the system?
+A: Use find /path -name 'filename.txt' to search for files. Use which <command_name> (e.g., which java or which docker) to find the full executable path of a command.
+
+Q10. What is the difference between apt and yum / dnf?
+A: They are both package managers. apt is used by Debian-based distributions (Ubuntu). yum or the newer dnf is used by RedHat-based distributions (CentOS/RHEL). They handle installing, upgrading, and removing software packages.

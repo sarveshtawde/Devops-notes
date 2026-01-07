@@ -1,0 +1,43 @@
+git config --global user.name "Sarvesh"
+git config --global user.email "123@jio.com"
+
+to check output we can do
+
+git config --global user.email
+
+Directly edit in config file by using below command
+
+git config --global --edit
+
+when i do this below command it will initiize my repostory
+
+git init
+
+this commnd will show what all new changes has been done newly
+
+git status
+
+we can do below command to add the new files from modified to staged state
+
+git add .
+
+git add <filename>
+
+## Working directory ---> git add . ---> Staging area ---> git commit ---> Repostory ##
+
+
+git log  (to check total commits done till now)
+
+git commit -m "1st commit done to github"  (to pust the changes from staging area to Repo)
+
+
+How to undo and go to previous commit
+
+git log  (here we will get commit ids)
+
+git checkout <commit hash code> 
+
+If we want to again go to main branch
+
+git checkout master
+

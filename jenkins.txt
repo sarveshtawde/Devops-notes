@@ -1,0 +1,206 @@
+Jenkins is the leading open-source automation server primarily used to facilitate Continuous Integration (CI) and Continuous Delivery (CD) pipelines.
+
+It is a Java-based tool that enables developers to automate the non-human parts of the software development process, focusing on building, testing, and deploying code reliably and quickly.
+
+------------------------------------------------------------------------------------------
+
+CI/CD Automation
+
+Jenkins monitors a Version Control System (like Git/GitHub) and automatically triggers defined actions whenever code changes are pushed. (webhooks)
+
+Continuous Integration (CI): Automates the process of fetching code, compiling it, running unit tests, and producing a deployable artifact (like a Docker image).
+
+Continuous Delivery (CD): Automates the process of taking the built artifact and deploying it to target environments (Dev, QA, or Production).
+
+-----------------------------------------------------------------------------------------------
+
+Jenkins Architecture
+
+Jenkins typically operates in a distributed architecture to handle large workloads:
+
+Jenkins Master (Controller): The main server that handles scheduling jobs, managing the UI, storing configurations, and coordinating the agents.
+
+Jenkins Agents (Nodes): Slave machines (often Docker containers or VMs) that execute the actual build and test jobs. This offloads work from the Master and allows builds to run in parallel on different operating systems or hardware.
+
+---------------------------------------------------------------
+Key Features
+
+Pipelines (Jenkinsfile): The modern, preferred way to define CI/CD workflows. Pipelines are defined using Groovy code in a file named Jenkinsfile that is stored in the project's source code repository (Git). This allows the build process to be version-controlled like the application code itself (Pipeline-as-Code).
+
+Plugins: Jenkins's strength lies in its vast plugin ecosystem (thousands of plugins) that allow it to integrate with virtually any external tool, including Docker, Kubernetes, AWS, Terraform, Git, and various testing frameworks.
+
+Freestyle Projects: The original method for defining build jobs, suitable for simple, single-step tasks, but less flexible than Pipelines.
+
+-----------------------------------------------------------------------------------------
+Jenkinsfile <--- file format name
+
+Declaritive pipeline:
+
+// The 'pipeline' block is the root element for a Jenkins Pipeline
+pipeline {
+    agent any
+    stages {
+        stage('Checkout Code') {
+            steps {
+                sh 'echo "Starting pipeline run..."'
+                checkout scm 
+                sh 'echo "Code checked out successfully."'
+            }
+        }
+        stage('Build Application') {
+            steps {
+                sh 'echo "Building the application artifact..."'
+                sh './build.sh --skip-tests'
+                sh 'echo "Build complete."'
+            }
+        }
+        stage('Run Unit Tests') {
+            steps {
+                sh 'echo "Executing unit tests..."'
+                sh './run_tests.sh'
+            }
+        }
+        stage('Deploy to DEV') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                sh 'echo "Deploying artifact to the Development Environment..."'
+            }
+        }
+    }
+    post {
+        always { 
+            cleanWs()
+        }
+        success {
+            sh 'echo "Pipeline SUCCESS: Build finished successfully!"'
+        }
+        failure {
+            sh 'echo "Pipeline FAILURE: Review logs for errors."'
+        }
+    }
+}
+-------------------------------------------------------------------------------------------------------------
+
+Scripted Jenkins Pipeline Example
+
+// A Scripted Pipeline starts with a 'node' block, which allocates an executor (agent).
+node {
+    // 1. Checkout Stage
+    stage('Checkout') {
+        // 'try/catch' blocks are common in Scripted Pipelines for explicit error handling.
+        try {
+            echo "Starting SCM checkout..."
+            // Check out the code from the repository
+            checkout scm
+        } catch (error) {
+            // If checkout fails, print the error and re-throw to fail the build.
+            echo "ERROR: Checkout failed: ${error}"
+            throw error 
+        }
+    }
+
+    // 2. Build Stage
+    stage('Build') {
+        // Use 'sh' to execute shell commands
+        sh 'echo "Building application with Maven..."'
+        // Example: Run a build command (e.g., compile code, generate artifact)
+        sh 'mvn clean package -DskipTests'
+    }
+
+    // 3. Conditional Stage
+    stage('Run Tests') {
+        // Groovy 'if' statement controls the flow
+        if (env.BRANCH_NAME == 'main') {
+            echo "Skipping tests for main branch deployment."
+        } else {
+            echo "Running unit and integration tests..."
+            // Example of running a test command
+            sh 'mvn test'
+        }
+    }
+
+    // 4. Deploy Stage
+    stage('Deploy') {
+        // Groovy logic for deployment decisions
+        if (fileExists('target/app.jar')) {
+            echo "Artifact found. Proceeding with deployment."
+            // Example: Deployment command using a custom shell script
+            sh './deploy_to_dev.sh'
+        } else {
+            // Throwing an error explicitly stops the build
+            error "Build artifact not found. Cannot deploy."
+        }
+    }
+}
+
+---------------------------------------------------------------------------------------------
+Essential Jenkins Interview Questions
+
+1. Q: CI, CD, and Continuous Deployment
+A: CI is merging code frequently and running automated builds/tests. CD ensures code is always ready for production (manual release gate). Continuous Deployment means every passed change automatically goes to production (no manual gate).
+
+2. Q: Jenkins Architecture (Master vs. Agent)
+A: The Master (Controller) handles scheduling, UI, and configuration. Agents (Nodes) execute the actual build and test workloads. Communication is typically via JNLP or SSH. Agents are used for parallel execution and isolation.
+
+3. Q: What is a Jenkinsfile and Pipeline-as-Code?
+A: The Jenkinsfile is a text file written in Groovy that defines the entire CI/CD pipeline. Pipeline-as-Code stores this file in Git, providing version control, auditability, and reproducibility for the entire build process.
+
+4. Q: Declarative vs. Scripted Pipelines
+A: Declarative is highly structured (fixed blocks: stages, agent). It's easier and standard for most workflows. Scripted uses full Groovy logic (if/else, try/catch, node block) for maximum custom control and complex flow logic.
+
+5. Q: How to handle secrets in a Pipeline?
+A: Secrets must be stored in the Jenkins Credentials Manager (never hardcoded). They are securely injected into pipeline steps using the withCredentials Groovy block, limiting their exposure only to the required step.
+
+6. Q: Explain Jenkins Shared Library.
+A: A Shared Library is a separate repository containing reusable Groovy functions (e.g., a standardized Docker build function). This is imported into multiple Jenkinsfiles to enforce consistency and adhere to DRY principles across many projects.
+
+7. Q: Dynamically provision Agents using Kubernetes (Pod Agents)?
+A: Using the Kubernetes Plugin, Jenkins spins up a disposable Pod (Agent) inside the EKS cluster only when a job runs. Once the job is finished, the Pod is terminated, ensuring a clean, cost-effective, and isolated environment for every build.
+
+8. Q: Describe a Rollback Process.
+A: A rollback is triggered by running the CD pipeline again, but specifically telling it to deploy the previous known-good artifact version (e.g., image v1.2.0) instead of the latest failed version.
+
+9. Q: Ensuring consistency and fast feedback cycles.
+A: Use Shared Libraries for standardization. Place quick stages (Unit Tests) early in the pipeline for fast feedback. Use Multi-stage Docker Builds and parallel execution to reduce overall run time.
+
+10. Q: Role of a Webhook in Jenkins integration.
+A: A Webhook is a mechanism where a Git service (GitHub/GitLab) sends an HTTP POST request to Jenkins when an event (like a code push) occurs. This immediately triggers the appropriate Jenkins job, enabling instant Continuous Integration.
+
+----------------------ECR-jenkins-pipleine--------------------------------------------------------------------
+
+pipeline{
+    agent { label 'dev' }
+    tools {
+        maven 'maven'
+    }
+    environment{
+        cred_var = credentials('AWS-Pratik_-ID')
+    }
+    stages{
+        stage('checkout stage'){
+            steps{
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'PAT_Jenkins', url: 'https://github.com/Pratik497/Private_Repo.git']])
+            }
+        }
+        stage('Maven-build'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+        stage('Docker-build'){
+            steps{
+                sh 'docker build -t 510301155996.dkr.ecr.ap-south-1.amazonaws.com/jenkins-repo:${BUILD_NUMBER} .'
+            }
+        }
+        stage('ECR Push'){
+            steps{
+                sh 'aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 510301155996.dkr.ecr.ap-south-1.amazonaws.com'
+                sh 'docker push 510301155996.dkr.ecr.ap-south-1.amazonaws.com/jenkins-repo:${BUILD_NUMBER}'
+                sh 'docker pull 510301155996.dkr.ecr.ap-south-1.amazonaws.com/jenkins-repo:${BUILD_NUMBER}'
+                sh 'docker run -itd --name ecr 510301155996.dkr.ecr.ap-south-1.amazonaws.com/jenkins-repo:${BUILD_NUMBER}'
+            }
+        }
+    }
+}

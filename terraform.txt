@@ -1,0 +1,157 @@
+Q) Terraform is an open-source Infrastructure as Code (IaC) tool created by HashiCorp.
+
+terraform init: Initializes the working directory, downloads necessary providers (plugins for AWS, Azure, etc.), and sets up the backend (where the state file will be stored, like S3).
+
+terraform fmt 
+
+terraform validate
+
+terraform plan: Compares your current HCL code against the remote state file and the actual infrastructure in the cloud. It generates an execution plan, showing exactly which resources will be created, changed, or destroyed.
+
+terraform apply: Executes the plan, making the necessary API calls to the cloud provider to provision or modify the infrastructure.
+
+-----------------------------------------------------------------------------------------------------
+
+Q) The state file (terraform.tfstate) is the most critical part of Terraform:
+
+It records the mapping between the resources defined in your HCL code and the real resources deployed in the cloud
+By comparing the state file with the current cloud infrastructure (a process called "refreshing state"), Terraform can detect manual changes made outside of Terraform (infrastructure drift).
+Due to its sensitive nature (it contains metadata, and potentially sensitive values), the state file must be stored securely using a remote backend (like S3/DynamoDB) and protected with state locking.
+
+LockID
+--------------------------------------------------------------------------------------------------------
+
+
+Q) Modules and Reusability
+
+Modules: Modules are reusable, self-contained packages of Terraform configurations. They allow you to create abstractions (e.g., a "Standard EKS Cluster Module") that can be shared across multiple projects or environments (Dev, QA, Prod), enforcing consistency.
+
+Providers: Providers are plugins that allow Terraform to interact with external APIs. Your AWS provider allows Terraform to understand and manage AWS-specific resources (like EKS), while another provider could manage your GitHub repository or DNS records.
+
+--------------------------------------------------------------------------------------------
+Q) State locking 
+
+The steps for implementing and using state locking in Terraform are an integral part of the standard Terraform workflow, especially when using a remote backend like AWS S3 and DynamoDB.
+
+🔒 State Locking Steps (Using AWS S3 and DynamoDB)
+
+### Step 1: Pre-requisite Setup
+
+You must ensure two resources exist in your AWS account before running Terraform:
+
+1.  **S3 Bucket:** An Amazon S3 bucket to store the `terraform.tfstate` file. This bucket should have **versioning** enabled for safety.
+2.  **DynamoDB Table:** A dedicated DynamoDB table created specifically for state locking. This table must have a simple primary key named **`LockID`** (case sensitive).
+
+### Step 2: Configure the Remote Backend
+
+In your Terraform configuration (e.g., in `versions.tf`), you must define the `s3` backend and specify both the S3 bucket and the DynamoDB table name.
+
+```terraform
+terraform {
+  backend "s3" {
+    bucket         = "my-eks-state-bucket"
+    key            = "dev/terraform.tfstate"
+    region         = "ap-south-1" 
+    # This line enables locking!
+    dynamodb_table = "terraform-locks" 
+    encrypt        = true
+  }
+}
+
+### Step 3: Initialize Terraform
+
+You must run `terraform init` to connect to the remote backend and set up the locking mechanism.
+
+  * **Command:** `terraform init`
+  * **Action:** Terraform reads the configuration, connects to the S3 bucket and the DynamoDB table, and ensures it can access both for state management and locking.
+
+### Step 4: The Locking Process (During `terraform apply`)
+
+When a user or a CI/CD pipeline runs a state-modifying command (like `plan` with the `-lock=true` flag, `apply`, or `destroy`), the following happens automatically:
+
+1.  **Attempt Lock:** Terraform first checks the DynamoDB table (`terraform-locks`) for an item matching the specific resource key (`LockID`).
+2.  **Lock Acquired:** If no item exists, Terraform creates a new entry in the DynamoDB table. This successfully **acquires the lock**. The entry includes the ID of the operation, the user, and the time.
+3.  **Operation Blocked:** If an item *already exists* for that key, it means another operation is currently in progress. The second user's `terraform apply` command will **fail immediately** with a message stating the state is locked by another process.
+4.  **Execute Operation:** With the lock successfully acquired, the primary operation (`apply`) proceeds to execute the infrastructure changes.
+
+### Step 5: The Unlocking Process
+
+1.  **Release Lock:** Once the `terraform apply` command successfully finishes, Terraform automatically removes the corresponding item from the DynamoDB table. The lock is **released**.
+2.  **Manual Unlock:** If the `apply` operation fails or crashes *before* releasing the lock, the lock may remain. A user must then manually force-unlock the state using the lock ID from the DynamoDB table: `terraform force-unlock <lock-id>` (use with caution).
+
+------------------------------------------------------------------------------------------
+Q) tf file
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+  # Define where to store the state (backend can be configured later)
+  backend "local" {}
+}
+# Provider configuration: specify the region for AWS
+provider "aws" {
+  region = "ap-south-1" # Mumbai region, or your preferred region
+}
+
+# 1. Resource Block: Provisions the VPC
+resource "aws_vpc" "app_vpc" {
+  # Define the IP range for the entire VPC
+  cidr_block = "10.0.0.0/16"
+  
+  # Enable DNS hostnames (required for EKS later)
+  enable_dns_hostnames = true
+
+  # Set tags for identification and billing
+  tags = {
+    Name        = "simple-tf-app-vpc"
+    Environment = "Dev"
+    Project     = "5G-NF-Test"
+  }
+}
+
+# 2. Output Block: Displays the ID of the created VPC after 'apply'
+output "vpc_id" {
+  description = "The ID of the newly created VPC"
+  value       = aws_vpc.app_vpc.id
+}
+
+# 3. Output Block: Displays the CIDR block
+output "vpc_cidr" {
+  description = "The main CIDR block for the VPC"
+  value       = aws_vpc.app_vpc.cidr_block
+}
+
+-----------------------------------------------------------------------------
+Q1. What is Terraform's main goal?
+A: To manage infrastructure using a declarative language (HCL) as code. Its main goal is to automate the provisioning, updating, and versioning of infrastructure (e.g., AWS, Azure, GCP) to ensure consistency.
+
+Q2. What is the Terraform workflow?
+A: The standard workflow is: terraform init (initializes directory, downloads providers) $\to$ terraform plan (shows what changes will occur) $\to$ terraform apply (executes the changes).
+
+Q3. What is the Terraform State file and its importance?
+A: The terraform.tfstate file is the source of truth. It maps the resources defined in your HCL code to the real resources deployed in the cloud. It's essential for change tracking, performance, and drift detection.
+
+Q4. How do you implement State Locking?
+A: State locking prevents concurrent modifications by multiple users or pipelines. When using AWS S3 for remote state, locking is implemented using a separate, dedicated DynamoDB table with a primary key named LockID.
+
+Q5. What is the difference between Terraform and Ansible?
+A: Terraform is a Provisioning tool (IaC); it creates cloud resources (VPCs, EC2, EKS). Ansible is a Configuration Management tool; it configures software and settings inside those resources (installing Apache, running scripts). They are complementary.
+
+Q6. What is Infrastructure Drift? How is it detected?
+A: Drift occurs when the actual state of the cloud infrastructure (e.g., an EC2 instance type was manually changed) no longer matches the expected state defined in the Terraform code. It is detected when running terraform plan, as Terraform compares the code against the live infrastructure.
+
+Q7. What are Modules?
+A: Modules are self-contained, reusable packages of Terraform configuration files. They allow complex configurations (like an "EKS-ready VPC") to be called and instantiated multiple times, enforcing standards and code reusability.
+
+Q8. Explain Terraform Providers.
+A: Providers are plugins (e.g., aws, kubernetes, helm) that enable Terraform to interact with the API of a specific service. They define the types of resources that Terraform can manage within that service.
+
+Q9. What are data sources?
+A: Data sources allow Terraform to fetch read-only information about existing resources that were not created by the current Terraform configuration. Examples include retrieving the latest AWS AMI ID or fetching an existing VPC ID.
+
+Q10. When would you use terraform import?
+A: terraform import is used once to bring manually created or existing infrastructure under Terraform management, allowing you to manage its future changes using HCL code.

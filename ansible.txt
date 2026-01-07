@@ -1,0 +1,68 @@
+Ansible is an open-source automation tool used for configuration management, application deployment, and task automation. It simplifies the process of managing a large number of servers (called "nodes" or "hosts") across various environments.
+
+Ansible is agentless. It does not require any special software or agent to be installed on the managed nodes.
+
+Automation tasks are defined in Playbooks, which are written in a simple, human-readable YAML format.
+
+---------------------------------------------------------------------------------------
+# This is the main Playbook definition
+- name: Configure Web Server and Start Service
+  hosts: all
+  # Run tasks with elevated (root) privileges
+  become: yes
+  tasks:
+    - name: Ensure Apache is installed
+      apt:
+        name: apache2
+        state: present 
+    - name: Ensure the Apache service is started and set to start on reboot
+      service:
+        name: apache2
+        state: started  # 'started' ensures the service is running
+        enabled: yes    # 'enabled' ensures it restarts after a reboot
+    - name: Deploy simple index.html page
+      copy:
+        content: "<h1>Hello from Ansible! Web server configured.</h1>"
+        dest: /var/www/html/index.html
+        mode: '0644' # Set file permissions
+		
+inventory file
+[all]
+server1 ansible_host=192.168.1.10
+server2 ansible_host=192.168.1.11
+
+Terraform provisions the EC2 instance, and Ansible configures the software on that EC2 instance.
+
+
+
+----------------------------------------------------------------------------
+
+Q1. What is the fundamental difference in Ansible's architecture?
+A: Ansible is agentless. It does not require any special software (agent/daemon) to be installed on the managed servers (nodes). It communicates with Linux nodes over standard SSH (and WinRM for Windows).
+
+Q2. What is an Ansible Playbook?
+A: A Playbook is a file written in YAML that defines a set of desired configuration states or tasks. It is the core of Ansible automation and is composed of one or more "Plays."
+
+Q3. Explain Idempotency in Ansible.
+A: Idempotency means that running the same Playbook multiple times will achieve the same result as running it once. If a resource is already in the desired state (e.g., a package is already installed), Ansible will not attempt to change it again.
+
+Q4. What is the role of the Inventory file?
+A: The Inventory file (usually inventory.ini or YAML format) lists all the managed nodes (servers) and organizes them into Groups (e.g., [webservers], [databases]) so that Playbooks can target specific sets of servers.
+
+Q5. What are Handlers, and how are they triggered?
+A: Handlers are tasks that only run when explicitly notified by a task. They are primarily used for actions that should happen only after a change, such as restarting a service after a configuration file has been updated.
+
+Q6. What is an Ansible Role?
+A: A Role is the standardized, structural way to organize and package related Playbooks, tasks, variables, files, and handlers into a reusable unit. This simplifies complex, multi-environment deployments and promotes shared automation logic.
+
+Q7. What is Ansible Vault, and why use it?
+A: Ansible Vault is a security feature used to encrypt sensitive data (passwords, API keys, secrets) within Playbooks and variable files. It ensures that credentials are never stored in plaintext in the repository.
+
+Q8. What is the purpose of become: yes?
+A: The become: yes directive is used to enable privilege escalation (equivalent to running as sudo on Linux). It allows Ansible to execute tasks that require root privileges on the managed node.
+
+Q9. What are Ansible Facts?
+A: Facts are variables automatically discovered and collected by Ansible from the managed node (server) when a Playbook runs. They contain system information like the operating system, memory, CPU count, and network interfaces.
+
+Q10. What is Dynamic Inventory?
+A: Dynamic Inventory is a script or plugin that automatically pulls the list of managed hosts directly from external sources like AWS EC2, EKS, or a CMDB, instead of relying on a manually maintained static file. This is essential for auto-scaling or cloud environments.

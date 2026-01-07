@@ -1,0 +1,112 @@
+Q) Multi-Stage Dockerfile Example
+
+######################################
+FROM golang:1.21-bullseye AS builder
+WORKDIR /app
+COPY main.go .
+FROM ubuntu:22.04
+WORKDIR /usr/bin
+COPY --from=builder /app/hello-ubuntu-app .
+ENTRYPOINT ["/usr/bin/hello-ubuntu-app"]
+
+##################################
+
+docker build -t <name> .
+---------------------------------------------------------------------
+
+RUN command
+- During image build.
+- To build the image layer by executing commands (e.g., install packages, compile code).
+
+CMD command
+- During container runtime.
+- To define the default command that is executed when the container starts
+
+ENTRYPOINT command
+- During container runtime.
+- To define the primary executable that will always run when the container starts.
+
+COPY command
+- Only copies files and directories as-is.
+- Does not support downloading files from remote URLs.
+
+ADD command 
+- Copies files, just like COPY.
+- Can download files directly from a URL and copy them to the image.
+
+-------------------------------------------------------------------------------------------
+
+Q) Docker Architecture and Components
+
+Docker Daemon (dockerd): The background service running on the host that manages images, containers, networks, and volumes.
+
+Docker Client: The primary way users interact with Docker (via the docker command). It uses the REST API to communicate with the Docker Daemon.
+
+Docker Registry: A storage and distribution system for Docker images (e.g., Docker Hub, AWS ECR).
+
+Containers vs. VMs: Know the key difference: Containers share the host OS kernel and are lightweight, while VMs virtualize the entire hardware stack, including the OS kernel.
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Q) Docker Compose is a tool used to define and run multi-container Docker applications. Instead of running each service separately with complex docker run commands, you use a single configuration file—usually named docker-compose.yaml—to manage the entire application stack.
+example: 
+##################################################
+version: '3.8'
+services:
+  web:
+    build: .                 # Build from the local Dockerfile
+    ports:
+      - "80:8000"            # Map host port 80 to container port 8000
+    depends_on:
+      - db                   # Ensure the database starts before the web app
+
+  db:
+    image: postgres:15-alpine # Use an official PostgreSQL image
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Mount a persistent volume
+
+volumes:
+  postgres_data:
+###################################################
+
+docker compose up
+docker compose down
+docker compose build  (Builds or rebuilds services defined in the YAML file. This is useful if you've made changes to a service's Dockerfile. )
+docker compose ps   (Lists all running containers)
+docker compose logs
+docker compose exec
+docker compose restart
+
+-----------------------------------------------------------------------------------------------------------------------------
+Q1. Containerization vs. Virtualization.
+A: Containers share the host OS kernel and are lightweight/fast to start. VMs virtualize the entire hardware stack and run a full, separate guest OS instance via a hypervisor.
+
+Q2. Difference between CMD and ENTRYPOINT.
+A: ENTRYPOINT defines the main executable that always runs when the container starts. CMD provides the default arguments to that ENTRYPOINT. CMD is easily overridden by docker run arguments; ENTRYPOINT is not.
+
+Q3. Explain Multi-Stage Builds.
+A: A multi-stage build uses two or more FROM instructions. The first stages contain heavy build tools (compilers, SDKs). The final stage copies only the minimal, compiled artifact from the earlier stages, drastically reducing the final image size and attack surface.
+
+Q4. Difference between COPY and ADD.
+A: COPY is the standard and preferred command; it only moves local files as-is. ADD has two extra features: it can fetch files from a remote URL, and it automatically extracts compressed local archives (e.g., .tar.gz).
+
+Q5. What are Docker Images and Layers?
+A: A Docker Image is a read-only template containing the application and its dependencies. It is built from a Dockerfile. An Image is composed of stacked Layers, where each instruction (RUN, COPY) in the Dockerfile creates a new read-only layer.
+
+Q6. How to map a port? Why is it necessary?
+A: You use the -p or --publish flag in docker run (e.g., -p 8080:80). It's necessary because containers use private, internal IP addresses and their internal ports are not exposed externally without explicit host port mapping.
+
+Q7. How do you handle persistent data storage?
+A: The standard method is using Volumes. Volumes are directories managed by Docker, stored outside the container's writable layer, and persist even if the container is stopped or deleted.
+
+Q8. What does the docker exec command do?
+A: docker exec runs a new command inside an already running container (e.g., docker exec -it <container_id> /bin/bash to open a shell for debugging).
+
+Q9. What is Docker Compose?
+A: Docker Compose is a tool for defining and running multi-container Docker applications using a single YAML file (docker-compose.yaml). It simplifies networking, volume, and service definitions for local development environments.
+
+Q10. What is the Docker Daemon (dockerd)?
+A: The Docker Daemon is the background service running on the host operating system. It listens for Docker API requests and manages all Docker objects: images, containers, volumes, and networks.

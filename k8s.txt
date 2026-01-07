@@ -1,0 +1,201 @@
+Q) Kubernetes Cluster Diagram
+
+-------------------------------------------------+  
+             CONTROL PLANE (MASTER)          |
+              (The "Brain" / Orchestration)   
++---------------------+-------------------+-------
+ API Server         | Scheduler         | etcd  
+  (Front End)        | (Pod Placement)   | (DB)  
++---------------------+-------------------+-------+
+
++--------------------------------------+   
+|         Worker Node 1                
+|         (The "Muscle" / Runtime)     
++------------------+-------------------+  
+|  Kubelet              | Kube-Proxy            
+|  (Node Agent)    | (Networking)     
++------------------+-------------------+   
+| +-----------+  +-----------+  +-----------+
+| | Pod 1     |  | Pod 2     |  | Pod 3     
+| | (Container)|  | (Container)|  | (Container)|
+| +-----------+  +-----------+  +-----------+
+
+
+-----------------------------------------------------
+Q) Kubernetes Deployment Strategies
+
+Rolling Update : The default strategy that gradually replaces old Pods with new ones, ensuring minimal downtime by controlling maximum availability and surge.
+
+Blue/Green : Two identical environments (Blue=old, Green=new) are maintained, and traffic is instantly switched from the old environment to the new one after successful testing.
+
+Canary : A progressive delivery approach that exposes a new version to a small percentage of users (a "canary" group) before gradually rolling it out to everyone.
+
+Shadow : The new version (shadow) receives a copy of real production traffic, but its responses are discarded, allowing for performance testing without affecting end-users.
+
+-----------------------------------------------------------------------------------------
+
+Q) Kubernetes Service Types
+
+ClusterIP: The default service type that provides a stable internal IP address for communication between services within the cluster only.
+
+NodePort: Exposes the application externally by opening a static port on every Worker Node's IP address.
+
+LoadBalancer: Leverages the cloud provider (like AWS in your EKS setup) to automatically provision an external load balancer and assign it a public IP.
+
+ExternalName: Maps a service to an external DNS name using a CNAME record, acting as a proxy to an external dependency.
+
+Headless: A service that does not allocate a ClusterIP and is used for scenarios (like databases) where you need to communicate directly with specific Pods.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+Q) Kinds used 
+
+Pod: The smallest deployable unit; encapsulates one or more containers that share networking and storage.
+
+Deployment: Provides declarative updates for Pods and ReplicaSets; used to manage rolling updates and track application versions.
+
+ReplicaSet: Ensures a specified number of Pod replicas are running at all times, handling self-healing and scaling.
+
+DaemonSet: Ensures that one copy of a Pod runs on every selected Worker Node (e.g., for logging agents or monitoring).
+
+StatefulSet: Manages Pods that require stable, persistent storage and unique network identities (used for databases or Kafka).
+
+Job: Creates one or more Pods and ensures that the tasks inside the Pods run to successful completion (e.g., batch processing).",
+
+CronJob: Creates Jobs on a repeating schedule (e.g., nightly backups or scheduled cleanup scripts).
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Q) Networking and Service Discovery
+
+
+Service: Defines a logical set of Pods and a policy to access them (the stable IP/DNS name for the application).
+
+Ingress: Manages external access to services within a cluster, typically providing HTTP/HTTPS routing and load balancing.
+
+Endpoint: Automatically populated by Kubernetes, listing the current IP addresses of the Pods backing a Service.
+
+-------------------------------------------------------------------------------------------
+
+Q) Configuration and Storage
+
+ConfigMap: Stores non-sensitive configuration data in key-value pairs to be injected into Pods as environment variables or files.
+
+Secret: Stores sensitive data (like passwords, tokens, keys) and provides mechanisms to securely inject them into Pods.
+
+PersistentVolume (PV): A piece of network storage (e.g., AWS EBS) provisioned in the cluster, independent of a Pod's lifecycle.
+
+PersistentVolumeClaim (PVC): A request by a Pod for a specific amount and type of storage, which binds to an available PV.
+
+StorageClass: Provides a way for administrators to define different tiers of storage available in the cluster (e.g., fast SSD vs. standard HDD).
+
+---------------------------------------------------------------------------------------------------------------
+
+Q) Cluster-Level Resources
+
+Node: Represents a worker machine (VM or physical) in the cluster where Pods are deployed.
+
+Namespace: Provides a way to virtually partition cluster resources into non-overlapping groups (e.g., separating Dev, QA, and Prod environments).
+
+------------------------------------------------------------------------------------------------------------------------------------
+k8s commands
+
+kubectl apply -f xyz.yaml
+kubectl get pod
+kubectl describe pod 
+kubectl delete
+kubectl logs
+kubectl exec
+kubectl top	(Shows CPU and memory usage for Nodes or Pods)
+kubectl rollout (Checks the status, pauses, resumes, undoes, or views the history of a Deployment rollout.)
+kubectl create configmap app-config-literal \  --from-literal=log_level=INFO \ --from-literal=feature_flag=true
+kubectl create configmap app-config-file \ --from-file=app.properties
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+k8s yaml example
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-web-deployment
+  labels:
+    app: web-app
+spec:
+  # Ensure 3 copies (replicas) of the Pod are always running
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: nginx-container
+        # Use a public image (Nginx web server)
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        resources:
+          # Define resource requests and limits (essential for EKS stability)
+          limits:
+            cpu: "500m"  # 0.5 CPU core
+            memory: "256Mi"
+          requests:
+            cpu: "250m"  # 0.25 CPU core
+            memory: "128Mi"
+---
+# 2. Service: Exposes the Deployment internally for communication
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-web-service
+spec:
+  # This selector matches the 'app: web-app' label on the Pods managed by the Deployment
+  selector:
+    app: web-app
+  # Service Type: ClusterIP means it's only accessible from within the cluster
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      # The port the service itself exposes (e.g., 80)
+      port: 80
+      # The port the target container is listening on (must match containerPort above)
+      targetPort: 80
+	  
+	  
+	----------------------------------------------------------------------
+	
+Q1. Describe the K8s Master/Worker Architecture.
+A: K8s uses a Control Plane (Master) and Worker Nodes. The Control Plane manages the cluster (scheduling, desired state). Worker Nodes run the actual Pods and container workloads.
+
+Q2. What is the role of etcd?
+A: etcd is the highly available, distributed key-value store. It acts as the single source of truth for the entire cluster, storing the complete configuration and the current state of all objects (Pods, Deployments, Services).
+
+Q3. What is the difference between a Deployment and a StatefulSet?
+A: Deployment manages stateless applications (all Pods are interchangeable). StatefulSet manages stateful applications (databases); its Pods have stable network identities, ordered scaling/termination, and unique Persistent Volumes.
+
+Q4. How does a Service connect to Pods?
+A: A Service uses Labels and Selectors. The Service configuration defines a selector (e.g., app: my-app) that matches the labels attached to the target Pods, dynamically directing traffic to them.
+
+Q5. Explain the purpose of a Namespace.
+A: A Namespace provides a mechanism for virtual clustering within a single physical cluster. It is used to logically divide cluster resources among different teams, applications, or environments (Dev/QA/Prod), providing scope for resource quotas and access control (RBAC).
+
+Q6. What is a Pod? Why not run a container directly?
+A: A Pod is the smallest deployable unit. It encapsulates one or more containers, sharing a single network namespace and storage. We use Pods because they allow closely related containers (like an application and a logging sidecar) to communicate via localhost.
+
+Q7. How does an external request reach a Pod (via LoadBalancer Service)?
+A: External traffic hits the Cloud Load Balancer (provisioned by the LoadBalancer Service type), which forwards traffic to the NodePort opened on the Worker Nodes, which then forwards the traffic to the correct Pod via Kube-proxy rules.
+
+Q8. What is the purpose of a ConfigMap and a Secret?
+A: ConfigMap stores non-sensitive configuration data (e.g., application settings, command-line arguments). Secret stores sensitive data (e.g., passwords, API keys). Both inject this data into Pods as environment variables or files.
+
+Q9. What is the difference between a RollingUpdate and a Recreate deployment strategy?
+A: RollingUpdate (default) gradually replaces old Pods with new ones, maintaining service availability (zero-downtime). Recreate terminates all old Pods before creating any new ones, resulting in a brief downtime.
+
+Q10. What is RBAC?
+A: Role-Based Access Control (RBAC) is the standard Kubernetes security mechanism. It regulates access by defining Roles (sets of permissions) and then using RoleBindings to grant those roles to specific users, groups, or Service Accounts.
