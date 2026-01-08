@@ -1,43 +1,309 @@
+========================
+GIT COMMANDS – COMPLETE INTERVIEW NOTES
+========================
+
+# Git Configuration
 git config --global user.name "Sarvesh"
 git config --global user.email "123@jio.com"
 
-to check output we can do
-
+# Check configuration
+git config --global user.name
 git config --global user.email
 
-Directly edit in config file by using below command
-
+# Edit git config file directly
 git config --global --edit
 
-when i do this below command it will initiize my repostory
 
+# Initialize Repository
 git init
 
-this commnd will show what all new changes has been done newly
 
+# Check status of repository
 git status
 
-we can do below command to add the new files from modified to staged state
 
+# Add files (Working Directory → Staging Area)
 git add .
-
 git add <filename>
 
-## Working directory ---> git add . ---> Staging area ---> git commit ---> Repostory ##
+
+# Commit changes (Staging Area → Repository)
+git commit -m "commit message"
 
 
-git log  (to check total commits done till now)
+# View commit history
+git log
+git log --oneline
 
-git commit -m "1st commit done to github"  (to pust the changes from staging area to Repo)
+
+# Go to previous commit (Detached HEAD)
+git checkout <commit-hash>
+
+# Return to main branch
+git checkout main
+# (or git checkout master)
 
 
-How to undo and go to previous commit
+# Branch commands
+git branch
+git branch <branch-name>
+git checkout <branch-name>
+git checkout -b <branch-name>
 
-git log  (here we will get commit ids)
 
-git checkout <commit hash code> 
+# Merge branches
+git merge <branch-name>
+git merge --abort        # Abort merge if conflict occurs
 
-If we want to again go to main branch
 
-git checkout master
+# Rebase (Linear history)
+git rebase main
+git rebase -i HEAD~3
+git rebase --abort
 
+
+# Cherry-pick (pick specific commit)
+git cherry-pick <commit-id>
+
+
+# Remote repository (GitHub)
+git remote add origin <repo-url>
+git remote -v
+
+
+# Push code to GitHub
+git push -u origin main
+
+
+# Fetch and Pull
+git fetch
+git pull origin main
+
+
+# Undo changes
+git checkout -- <file>          # Undo file changes before staging
+git reset <file>                # Unstage file
+git reset --soft HEAD~1         # Undo last commit (keep changes)
+git reset --hard HEAD~1         # Undo last commit (delete changes)
+
+
+# Restore commands (newer Git)
+git restore <file>
+git restore --staged <file>
+
+
+# Stash commands
+git stash
+git stash list
+git stash apply
+git stash pop
+
+
+# Delete files/folders
+git rm <file>
+git rm -r <folder>
+
+
+# Clean untracked files/folders
+git clean -f
+git clean -fd
+
+
+# Tags (Release management)
+git tag
+git tag v1.0
+git push origin v1.0
+git push origin --tags
+
+
+# Submodules
+git submodule add <repo-url>
+git submodule update --init --recursive
+git submodule status
+
+
+# Check differences
+git diff
+git diff --staged
+
+
+# Show file commit history
+git blame <file>
+
+
+# Show commit details
+git show
+
+
+# Git Flow
+Working Directory → Staging Area → Repository
+
+# Important Concepts
+HEAD  → Points to current commit
+Branch → Pointer to commits
+Remote → GitHub/GitLab repository
+
+
+
+## 🔥 Top 20 Git Interview Questions & Answers
+
+---
+
+### 1️⃣ What is Git?
+
+**Answer:**
+Git is a **distributed version control system** used to track code changes, collaborate with teams, and manage source code history.
+
+---
+
+### 2️⃣ What is the difference between Git and GitHub?
+
+**Answer:**
+
+* **Git** → Version control tool
+* **GitHub** → Remote hosting platform for Git repositories
+
+---
+
+### 3️⃣ What is a repository?
+
+**Answer:**
+A repository is a place where **project files and their version history** are stored.
+
+---
+
+### 4️⃣ What are the three states of Git?
+
+**Answer:**
+
+1. Working Directory
+2. Staging Area
+3. Repository (Local)
+
+---
+
+### 5️⃣ What is the staging area?
+
+**Answer:**
+It is an intermediate area where changes are prepared before committing.
+
+---
+
+### 6️⃣ What is the difference between `git fetch` and `git pull`?
+
+**Answer:**
+
+* `git fetch` → Downloads changes without merging
+* `git pull` → Downloads and merges changes
+
+---
+
+### 7️⃣ What is a branch?
+
+**Answer:**
+A branch is a **separate line of development** that allows parallel work.
+
+---
+
+### 8️⃣ Difference between `git merge` and `git rebase`?
+
+**Answer:**
+
+* **Merge** keeps history and creates a merge commit
+* **Rebase** rewrites history and creates a linear commit history
+
+---
+
+### 9What is a merge conflict?
+
+**Answer:**
+A merge conflict occurs when Git cannot automatically combine changes from different branches.
+
+---
+
+### 🔟 How do you resolve a merge conflict?
+
+**Answer:**
+
+1. Open the conflicted file
+2. Fix the conflicting code
+3. `git add <file>`
+4. `git commit`
+
+---
+
+### 1️⃣1️⃣ What is `HEAD` in Git?
+
+**Answer:**
+HEAD is a pointer to the **current commit or branch**.
+
+---
+
+### 1️⃣2️⃣ What is `git stash`?
+
+**Answer:**
+It temporarily saves uncommitted changes so you can work on something else.
+
+---
+
+### 1️⃣3️⃣ Difference between `git reset` and `git revert`?
+
+**Answer:**
+
+* `git reset` → Removes commits (history rewrite)
+* `git revert` → Creates a new commit to undo changes (safe)
+
+---
+
+### 1️⃣4️hat is `git cherry-pick`?
+
+**Answer:**
+It applies a **specific commit** from one branch to another.
+
+---
+
+### 1️⃣5️⃣ What is a detached HEAD?
+
+**Answer:**
+When HEAD points to a commit instead of a branch.
+
+---
+
+### 1️⃣6️⃣ How do you undo a commit?
+
+**Answer:**
+
+```bash
+git reset --soft HEAD~1   # keep changes
+git reset --hard HEAD~1   # delete changes
+```
+
+---
+
+### 1️⃣7️⃣ What is `git tag`?
+
+**Answer:**
+Tags are used to **mark releases** (e.g., v1.0).
+
+---
+
+### 1️⃣8️⃣ What is a submodule?
+
+**Answer:**
+A submodule is a Git repository inside another Git repository.
+
+---
+
+### 1️⃣9️⃣ What is `git clean`?
+
+**Answer:**
+It removes **untracked files and folders**.
+
+---
+
+### 2️⃣0️⃣ What happens during `git push`?
+
+**Answer:**
+Local commits are sent to the **remote repository**.
+
+-
