@@ -47,6 +47,22 @@ ExternalName: Maps a service to an external DNS name using a CNAME record, actin
 Headless: A service that does not allocate a ClusterIP and is used for scenarios (like databases) where you need to communicate directly with specific Pods.
 
 --------------------------------------------------------------------------------------------------------------------------------
+Q) Set a ResourceQuota for the namespace
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ns-quota
+  namespace: my-namespace
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    pods: "20"
+
+kubectl apply -f quota.yaml
 
 Q) Kinds used 
 
@@ -199,3 +215,109 @@ A: RollingUpdate (default) gradually replaces old Pods with new ones, maintainin
 
 Q10. What is RBAC?
 A: Role-Based Access Control (RBAC) is the standard Kubernetes security mechanism. It regulates access by defining Roles (sets of permissions) and then using RoleBindings to grant those roles to specific users, groups, or Service Accounts.
+
+
+
+Q) How to upgarde the k8s cluster in production (k8s v:1.30 --> v1.31)
+
+Pre-checks:
+
+1. We can have multiple environment in the organizations like unit,stage,pre and Prod
+2. Before upgrading the k8s cluster below pre-requisites we need to follow
+a) cordon nodes (Cordon nodes means marking a node as unschedulable, so no new workloads are placed on it, while existing workloads keep running.) so inform team regarding the same.
+b) Read new release notes 
+c) Make sure that you are sure about the new k8s release upgrade as if you upgrade the cluster you cannot downgrade it back , you need to do then fresh deployment of cluster. So before procceding for upgrade in production make sure to test the release in other environments (unit,stage,pre) before going on production.
+d) Control plain and nodes should be on same version
+e) Cluster auto scaller version should be same as control plain and nodes
+f) Alleast 5 availabile Ip address (subnet) ,during k8s cluster creation
+g) kubelet should match version of control plain
+
+
+Q) Liveness vs Readiness 
+
+Liveness probe checks whether the application is still running.
+If it fails, Kubernetes restarts the container.
+It’s used to recover from deadlocks or hung processes.
+
+Readiness probe checks whether the application is ready to serve traffic.
+If it fails, the pod is removed from service endpoints, but not restarted.
+It’s used when the app depends on external services or needs warm-up time.
+
+Liveness decides restart, readiness decides traffic routing.
+
+Both are health checks defined on a container, but they answer different questions.
+
+🔁 Liveness Probe – “Should this container be restarted?”
+
+Checks if the app is alive
+
+If it fails → Kubernetes restarts the container
+
+Use when the app can get stuck or deadlocked
+
+Example
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+
+Typical use cases
+
+App is running but not responding
+
+Infinite loop / deadlock
+
+JVM or Node app frozen
+
+🚦 Readiness Probe – “Can this container receive traffic?”
+
+Checks if the app is ready to serve requests
+
+If it fails → pod is removed from Service endpoints
+
+Container is NOT restarted
+
+Example
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+Typical use cases
+
+App waiting for DB connection
+
+Cache warming
+
+Startup still in progress
+
+Temporary overload
+
+ --------------------------------------
+ 
+Q) init container
+
+An init container runs before the main application container starts.
+It must complete successfully before the pod becomes ready.
+It’s used for setup tasks like waiting for dependencies or running migrations.
+
+initContainers:
+- name: wait-for-db
+  image: busybox
+  command:
+    - sh
+    - -c
+    - |
+      until nc -z db 5432; do
+        echo "Waiting for DB..."
+        sleep 5
+      done
+
+One-line real example (interview bonus)
+
+“We use an init container to wait for the database, readiness probe to stop traffic during DB outages, and liveness probe to restart stuck pods.”
