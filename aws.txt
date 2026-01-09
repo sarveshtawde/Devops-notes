@@ -1,0 +1,319 @@
+
+
+## Q) AWS Global Architecture Diagram
+
+```
+-------------------------------------------------------
+                    AWS GLOBAL INFRA
+-------------------------------------------------------
+        REGION (e.g., us-east-1)
+-------------------------------------------------------
+   Availability Zone A        Availability Zone B
+-------------------------------------------------------
+|   EC2     |   RDS     |   EC2     |   RDS          |
+|   ALB     |           |   ALB     |               |
+-------------------------------------------------------
+         |                   |
+         +------ VPC --------+
+                |
+        ---------------------
+        |   Internet GW     |
+        ---------------------
+                |
+            Internet
+```
+
+---
+
+## Q) Core AWS Services (High-Level)
+
+### Compute
+
+* **EC2** – Virtual machines
+* **Lambda** – Serverless functions
+* **ECS / EKS** – Container orchestration
+* **Elastic Beanstalk** – PaaS
+
+### Storage
+
+* **S3** – Object storage
+* **EBS** – Block storage for EC2
+* **EFS** – Shared file storage
+* **Glacier** – Archival storage
+
+### Database
+
+* **RDS** – Managed relational DB
+* **DynamoDB** – NoSQL key-value DB
+* **Aurora** – High-performance RDS
+* **Redshift** – Data warehouse
+
+---
+
+## Q) AWS VPC Architecture Diagram
+
+```
+--------------------- VPC -----------------------
+|                                               |
+|  Public Subnet        Private Subnet           |
+|  -------------        --------------           |
+|  |  EC2 + ALB |       |  EC2 + App |           |
+|  |            |       |            |           |
+|  -------------        --------------           |
+|       |                     |                 |
+|  Internet GW           NAT Gateway             |
+|       |                     |                 |
+-------------------------------------------------
+```
+
+---
+
+## Q) AWS Networking Components
+
+* **VPC** – Isolated virtual network
+* **Subnet** – Logical AZ-based network
+* **Route Table** – Traffic routing rules
+* **Internet Gateway** – Public internet access
+* **NAT Gateway** – Outbound internet for private subnets
+* **Security Group** – Stateful firewall
+* **NACL** – Stateless subnet firewall
+
+---
+
+## Q) Load Balancer Types (ELB)
+
+| Type    | Use Case                  |
+| ------- | ------------------------- |
+| **ALB** | HTTP/HTTPS, microservices |
+| **NLB** | High performance, TCP     |
+| **CLB** | Legacy                    |
+
+```
+User → ALB → EC2 (AZ-A)
+           → EC2 (AZ-B)
+```
+
+---
+
+## Q) Auto Scaling Group (ASG)
+
+```
+CPU ↑
+   |
+   +--> ASG launches new EC2
+   |
+CPU ↓
+   |
+   +--> ASG terminates EC2
+```
+
+**Purpose:**
+Automatically scale EC2 instances based on demand.
+
+---
+
+## Q) AWS IAM (Identity & Access Management)
+
+### IAM Components
+
+* **User** – Individual identity
+* **Group** – Collection of users
+* **Role** – Temporary permissions
+* **Policy** – Permission document (JSON)
+
+```
+User → Group → Policy
+EC2 → IAM Role → S3 Access
+```
+
+---
+
+## Q) IAM Policy Example
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::my-bucket/*"
+  }]
+}
+```
+
+---
+
+## Q) AWS Storage Types Comparison
+
+| Service | Type    | Use Case             |
+| ------- | ------- | -------------------- |
+| S3      | Object  | Backup, static files |
+| EBS     | Block   | EC2 disks            |
+| EFS     | File    | Shared storage       |
+| Glacier | Archive | Long-term backup     |
+
+---
+
+## Q) S3 Architecture
+
+```
+S3 Bucket
+ ├── images/
+ ├── logs/
+ └── backups/
+```
+
+**Features**
+
+* Versioning
+* Encryption
+* Lifecycle policies
+* Cross-region replication
+
+---
+
+## Q) AWS Deployment Strategies
+
+* **Rolling** – Gradual replacement (default)
+* **Blue/Green** – Zero downtime switch
+* **Canary** – Partial traffic testing
+* **Immutable** – New infra per release
+
+---
+
+## Q) Monitoring & Logging
+
+* **CloudWatch** – Metrics, logs, alarms
+* **CloudTrail** – API auditing
+* **AWS Config** – Resource compliance
+
+---
+
+## Q) Shared Responsibility Model
+
+```
+AWS RESPONSIBILITY
+- Data center
+- Hardware
+- Network
+- Hypervisor
+
+CUSTOMER RESPONSIBILITY
+- OS patches
+- Application
+- Data
+- IAM
+```
+
+---
+
+## Q) AWS CLI Common Commands
+
+```bash
+aws configure
+aws ec2 describe-instances
+aws s3 ls
+aws s3 cp file.txt s3://my-bucket/
+aws iam list-users
+aws cloudwatch get-metric-data
+```
+
+---
+
+## Q) EC2 Launch Flow
+
+```
+AMI → Instance Type → Key Pair
+ → Security Group → EBS → EC2
+```
+
+---
+
+## Q) Sample EC2 Use Case
+
+**Web App Architecture**
+
+```
+User
+ ↓
+ALB
+ ↓
+Auto Scaling Group
+ ↓
+EC2 Instances
+ ↓
+RDS (Multi-AZ)
+```
+
+---
+
+## Q&A (Interview Focused)
+
+### Q1. What is a Region vs AZ?
+
+**A:** Region is a geographical area; AZs are isolated data centers within a region.
+
+---
+
+### Q2. Difference between Security Group and NACL?
+
+**A:**
+
+* SG → Stateful, instance-level
+* NACL → Stateless, subnet-level
+
+---
+
+### Q3. What is IAM Role?
+
+**A:** Temporary permissions assumed by AWS services (EC2, Lambda).
+
+---
+
+### Q4. How does ALB differ from NLB?
+
+**A:**
+
+* ALB → Layer 7 (HTTP)
+* NLB → Layer 4 (TCP)
+
+---
+
+### Q5. What happens when an EC2 fails in ASG?
+
+**A:** ASG automatically replaces it.
+
+---
+
+### Q6. Difference between S3 and EBS?
+
+**A:**
+
+* S3 → Object storage
+* EBS → Block storage for EC2
+
+---
+
+### Q7. What is Multi-AZ RDS?
+
+**A:** Synchronous standby replica for high availability.
+
+---
+
+### Q8. What is CloudTrail used for?
+
+**A:** Auditing who did what in AWS.
+
+---
+
+### Q9. What is NAT Gateway?
+
+**A:** Allows private subnet instances outbound internet access.
+
+---
+
+### Q10. What is Serverless?
+
+**A:** No server management (Lambda, DynamoDB).
+
+---
