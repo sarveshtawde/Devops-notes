@@ -125,6 +125,41 @@ output "vpc_cidr" {
   value       = aws_vpc.app_vpc.cidr_block
 }
 
+--------------------------------------------------------------------------------------------
+Q) How to import existing infra on aws to terraform
+
+1. do terraform init
+2. create one main.tf file in that 
+
+provider "aws" {
+  region= us-east-1 }
+  
+import {
+ id = "id-12345566" #aws instance id which need to be imported
+ 
+ to = asw.instance.example
+ 
+ }
+
+3. terrafrom init
+4. terraform plan -generates-config-output=genarated_resource.tf
+5. This above command will generate all details of that instance in genarated_resource.tf
+6. Then copy that details in your main.tf file again and delete the file genarated_resource.tf and delete import block from your main.tf file
+7. If you do terraform plan still terrafrom will not know that you have a infra already on aws for that you need to run below command.
+8. terraform import aws_instance.example i-122344#insatnce-id
+
+--------------------------------------------------------------------------------------------
+
+Q) Drift detection in terraform
+exmaple : some one from the team has done some mannul changes on aws account and now there is diffence in state file in tf and actal infra on aws now this has become tf drift secanrio to over come this we can do 
+
+terraform refresh
+
+or
+
+confiure very strict iam rule
+setup some audit logs (cloud watch)
+what we can do is use lamda function and when a unwanted change is done by wrong iam person it will check the audit logs and share notifiaction to superuser of tf (main person)
 -----------------------------------------------------------------------------
 Q1. What is Terraform's main goal?
 A: To manage infrastructure using a declarative language (HCL) as code. Its main goal is to automate the provisioning, updating, and versioning of infrastructure (e.g., AWS, Azure, GCP) to ensure consistency.
