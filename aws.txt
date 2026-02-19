@@ -317,3 +317,31 @@ RDS (Multi-AZ)
 **A:** No server management (Lambda, DynamoDB).
 
 ---
+
+Aws Services explainination:
+
+Route 53 : 
+1) When user access for example "amazon.com", then in route53 this dns is configured here. Basically route53 is DNS and traffic manangement service. 
+2) It also allows us to setup healthchecks for the instances for example we have 10instances , so it will check which instance is healthy and route that traffic to that instance when users searches amazon.com. Typicall we don't point it directly on servers we point it towards a load balancer.
+3) We can have geographic ,latency or failover based routings throught route53
+
+
+Amazon S3 bucket:
+1) It is a simple storage service in which we can store images,html files etc, in this case the amazon.com website html and images files
+
+
+AWS cloud Front:
+1) If a user from india tries to fetch some content from amazon.com but if your website data is stored in s3 bucket in USA, then user will face some delay in fetching those details.
+2) AWS Cloud Front does regional caching , which means that it replicates all the data in the s3 bucket of your website on different regions all acoss the world. 
+3) So when user from any region tries to get to website ,it will get details from the neariest cloud front distribution.
+
+
+Api 
+a) LoadBalancer
+1) it is used to horizontally scale your application , if i am a who wants to get something through api "get amazon.com"then loadbalancer will route that traffic to one of the instance accordingly.
+
+b) API gateway
+1) It is basically a frount door of AWS , for example by route53 you can send request to api gatway then api gateway will route that request to compute and also all other type of AWS services as well
+2) By using this we can also restrict specific user requests limits for example 1000 requests, also user permissions, throughtling
+
+
