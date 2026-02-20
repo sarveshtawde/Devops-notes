@@ -1,0 +1,195 @@
+AWS Services
+
+---
+
+A) Networking and Edge Services
+
+i) Route 53 (Amazon Route 53 – DNS Service)
+DNS (Domain Name System) service that converts domain name to IP address.
+Example: Like a phonebook. You type amazon.com, it finds the server IP.
+Supports health checks and routing policies like latency, geographic, failover, and weighted routing.
+
+ii) CloudFront (Amazon CloudFront – Content Delivery Network)
+CDN (Content Delivery Network) that caches content closer to users.
+Example: Keeping copies of data in multiple cities to reduce delay.
+
+iii) Elastic Load Balancer (ELB – ALB/NLB)
+ALB – Application Load Balancer
+NLB – Network Load Balancer
+Distributes traffic across multiple servers.
+Example: Traffic police distributing vehicles to different roads.
+
+iv) API Gateway (Amazon API Gateway)
+Managed service to create and manage APIs.
+Example: Receptionist that forwards requests to correct backend service.
+Supports throttling and authentication.
+
+v) WAF (AWS Web Application Firewall)
+Protects applications from attacks like SQL injection and XSS.
+
+vi) AWS Shield
+Protection against DDoS (Distributed Denial of Service) attacks.
+
+vii) ACM (AWS Certificate Manager)
+Manages SSL/TLS certificates for HTTPS security.
+
+viii) Cognito (Amazon Cognito)
+User authentication and authorization service.
+Creates user pool and generates authentication tokens.
+
+
+
+B) Core Networking
+
+i) VPC (Virtual Private Cloud)
+Private network inside AWS.
+Example: Your own private land inside a city.
+Contains subnets, route tables, security groups.
+
+ii) Internet Gateway (IGW – Internet Gateway)
+Allows VPC to connect to the internet.
+Attached to VPC for public subnet access.
+
+iii) NAT Gateway (Network Address Translation Gateway)
+Allows private subnet instances to access internet securely without being publicly exposed.
+
+iv) Auto Scaling (Amazon EC2 Auto Scaling)
+Automatically increases or decreases EC2 instances based on traffic.
+
+v) IAM (Identity and Access Management)
+Manages users, roles, permissions, and policies in AWS.
+
+---
+
+Compute Services
+
+EC2 (Elastic Compute Cloud)
+Virtual server in AWS.
+
+Lightsail (Amazon Lightsail)
+Simplified VPS (Virtual Private Server) service.
+
+ECS (Elastic Container Service)
+Container orchestration service for Docker containers.
+
+Fargate (AWS Fargate)
+Serverless compute engine for containers.
+
+EKS (Elastic Kubernetes Service)
+Managed Kubernetes service.
+
+Lambda (AWS Lambda)
+Serverless compute service.
+Runs code without managing servers.
+
+---
+
+Storage Services
+
+S3 (Simple Storage Service)
+Object storage service for files, images, backups.
+
+EBS (Elastic Block Store)
+Block storage attached to one EC2 instance.
+
+EFS (Elastic File System)
+Shared file storage for multiple EC2 instances.
+
+---
+
+Configuration and Security
+
+Secrets Manager (AWS Secrets Manager)
+Securely stores passwords and API keys.
+
+AppConfig (AWS AppConfig)
+Manages application configuration dynamically.
+
+---
+
+Databases
+
+RDS (Relational Database Service)
+Managed relational database (MySQL, PostgreSQL, etc.).
+
+Aurora (Amazon Aurora)
+High-performance relational database compatible with MySQL/PostgreSQL.
+
+DynamoDB (Amazon DynamoDB)
+Fully managed NoSQL key-value database.
+
+DocumentDB (Amazon DocumentDB)
+MongoDB-compatible database service.
+
+DMS (Database Migration Service)
+Migrates databases from on-premises or other clouds to AWS.
+
+---
+
+Caching
+
+ElastiCache (Amazon ElastiCache)
+In-memory caching service (Redis or Memcached).
+
+MemoryDB (Amazon MemoryDB for Redis)
+Durable in-memory Redis database.
+
+---
+
+Application Integration
+
+SNS (Simple Notification Service)
+Publish/subscribe messaging service.
+
+SQS (Simple Queue Service)
+Message queue service for decoupling applications.
+
+EventBridge (Amazon EventBridge)
+Event bus service to route events between AWS services.
+
+Step Functions (AWS Step Functions)
+Workflow orchestration service.
+
+---
+
+Data and Analytics
+
+EMR (Elastic MapReduce)
+Big data processing service using Hadoop/Spark.
+
+Athena (Amazon Athena)
+Query S3 data using SQL without servers.
+
+Glue (AWS Glue)
+ETL (Extract, Transform, Load) data integration service.
+
+---
+
+Monitoring and Logging
+
+CloudWatch (Amazon CloudWatch)
+Monitoring service for logs, metrics, and alarms.
+
+CloudTrail (AWS CloudTrail)
+Tracks user activity and API calls.
+
+AWS Config (AWS Config Service)
+Monitors resource configuration and compliance.
+
+X-Ray (AWS X-Ray)
+Application tracing and debugging service.
+
+---
+
+CI/CD
+
+CodeBuild (AWS CodeBuild) – Builds source code
+CodeDeploy (AWS CodeDeploy) – Deploys applications
+CodePipeline (AWS CodePipeline) – Automates CI/CD workflow
+
+---
+
+Infrastructure as Code
+
+CloudFormation (AWS CloudFormation)
+Creates and manages AWS infrastructure using code (YAML/JSON templates).

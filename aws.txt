@@ -337,12 +337,151 @@ AWS cloud Front:
 3) So when user from any region tries to get to website ,it will get details from the neariest cloud front distribution.
 
 
-Api 
+Api :
 a) LoadBalancer
 1) it is used to horizontally scale your application , if i am a who wants to get something through api "get amazon.com"then loadbalancer will route that traffic to one of the instance accordingly.
 
 b) API gateway
 1) It is basically a frount door of AWS , for example by route53 you can send request to api gatway then api gateway will route that request to compute and also all other type of AWS services as well
 2) By using this we can also restrict specific user requests limits for example 1000 requests, also user permissions, throughtling
+
+
+WAF (Web Application Firewall):
+It helps in protecting from BOT attacks where someone tries to scan your endpoints to find out different types of varnibilities 
+this is added before loadbalancer 
+
+AWS Shield:
+IF we wnat to get protection from DAAS (distributed analyes attack)
+this is added before loadbalancer 
+
+Certificate Manager:
+It allows you to ensure that your endpoints in Route53 have a vaild certificate 
+
+
+AWS Cognito:
+It create a user pool in which user needs to be register , then you become a valid user and when that user tries to login and if it is a valid user then token is genereted and send to Api (loadbalancer, apigateway) tell it that he is valid  user and to proceed ahead with the regquest.
+basically it does authentication and authorization
+
+Compute:
+
+a) Ec2:
+Amazon Elastic Compute Cloud (Amazon EC2) offers the broadest and deepest compute platform, with over 600 instance types and a choice of the latest processors, storage, networking, operating systems, and purchase models to help you best match the needs of your workload.
+
+
+b) Amazon Lightsail:
+Amazon Lightsail is the easiest way to get started with Amazon Web Services (AWS) for anyone who needs to build websites or web applications. It includes everything you need to launch your project quickly—instances (virtual private servers), container services, managed databases, content delivery network (CDN) distributions, load balancers, SSD-based block storage, static IP addresses, DNS management of registered domains, and resource snapshots (backups)—for a low, predictable monthly price.
+
+
+c) ECS: (Elastic Container Service)
+
+
+d) Fargate
+
+
+e) EKS : (Elastic Kubernetes Service)
+
+
+g) AWS Lamda
+
+
+Storage:
+
+a) EFS (Elastic File systems) 
+it can be use to multiple ec2 instances at a time
+
+b) EBS (Elastic Block Storage)
+it can be use one ec2instance at a time only
+
+Config:
+
+a) Secrets Manager
+
+b) AWS APP Config:
+consider this as an If statment --if road open go startight oreelsse take left
+
+Databases:
+
+a) RDS (AWS Reletional database):
+MySQL
+
+b) Aurora:
+this is also retional data base
+It additinally supports serverless varient DB , charged as per usage
+
+c) DynamoDB: 
+it is no SQL DB
+
+
+d) Document DB (Mongo DB): 
+
+
+e) DMS (Data base migeration service)
+It is not a DB but it is used to migrate databases into AWS like you have some postgress DB then u can use DMS to mignraete it to AWS and then host that data to RDS DB.
+
+
+Caching: 
+
+a) EleasticCache:
+In this it will cache the data of you ec2 but if all your ec2 goes down then it again need to cache data from the DB which can slow the website loading process due to this MemoryDB came in picture
+It losses all state when the node goes down
+
+b) MemoryDB
+It does not losses all state when the node goes down, it stores the data and when node comes up it caches the data back
+
+
+Application Cordination:
+
+a) SNS (Simple Notification Service): 
+
+b) SQS (Simple Queing Service):
+
+c) Eventbridge: 
+
+d) Step Functions:
+
+
+Data Processing and Analytics:
+
+a) S3 
+
+b) EMR (Eleastic mass reduce):
+it can do anyaliss of data from s3
+in this we process the data and we need to put it back some were may be s3
+
+c) Athena: 
+In athena it will direclty read off the data from s3 fror anayasit and it doesnt need to be put back somewhere
+
+
+d) Glue:
+it is used in regular data engineering
+
+
+Montering and Logging:
+
+a) CloudWatch:
+display logs, read logs , craete alarams
+
+b) Cloud Trail:
+Audit log of users of AWS
+
+c) AWS Config: 
+For example for every s3 bucket created i want public access disable the here we can create a policy in aws config and when user does so it will raise and alarm and tell the user about it 
+
+d) X-ray
+traces of application logs to do debugging
+
+
+CI/CD:
+
+a) CodeBulid:
+
+b)CodeDeploy:
+
+c) CodePipeline
+
+
+infrasturcture as code:
+
+a) Cloud Formation
 
 
