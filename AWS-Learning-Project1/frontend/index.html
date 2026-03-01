@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AWS Microservices Demo</title>
+</head>
+<body>
+    <h1>Frontend Service</h1>
+    <button onclick="getData()">Get DB Time</button>
+    <p id="output"></p>
+
+    <script>
+        async function getData() {
+            const response = await fetch('/api/data');
+            const data = await response.json();
+            document.getElementById("output").innerText = JSON.stringify(data);
+        }
+    </script>
+</body>
+</html>
