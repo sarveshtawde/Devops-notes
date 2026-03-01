@@ -142,7 +142,7 @@ import {
  }
 
 3. terrafrom init
-4. terraform plan -generates-config-output=genarated_resource.tf
+4. terraform plan -generate-config-output=genarated_resource.tf
 5. This above command will generate all details of that instance in genarated_resource.tf
 6. Then copy that details in your main.tf file again and delete the file genarated_resource.tf and delete import block from your main.tf file
 7. If you do terraform plan still terrafrom will not know that you have a infra already on aws for that you need to run below command.

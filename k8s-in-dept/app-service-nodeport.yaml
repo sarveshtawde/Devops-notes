@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: my-app-service
+spec:
+ type: NodePort
+ selector:
+  app: my-app #by this name lables in deployment
+ ports:
+    port : 80 # serviceport
+    targetPort: 80 # Containerport
+    NodePort: 30080 # Optional (must be between 30000–32767)

@@ -1,0 +1,43 @@
+version: 0.2
+
+env:
+  variables:
+    FRONTEND_REPO_URI: 663666504915.dkr.ecr.ap-south-1.amazonaws.com/aws-app-frontend
+    BACKEND_REPO_URI: 663666504915.dkr.ecr.ap-south-1.amazonaws.com/aws-app-backend
+    IMAGE_TAG: latest
+
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging into ECR...
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 663666504915.dkr.ecr.ap-south-1.amazonaws.com
+
+  build:
+    commands:
+      - echo "Building backend image"
+      - cd backend
+      - docker build -t backend-app .
+      - docker tag backend-app:latest $BACKEND_REPO_URI:$IMAGE_TAG
+      - cd ..
+
+      - echo "Building frontend image"
+      - cd frontend
+      - docker build --build-arg REACT_APP_API_URL=/api -t frontend-app .
+      - docker tag frontend-app:latest $FRONTEND_REPO_URI:$IMAGE_TAG
+      - cd ..
+
+  post_build:
+    commands:
+      - echo "Pushing backend image..."
+      - docker push $BACKEND_REPO_URI:$IMAGE_TAG
+
+      - echo "Pushing frontend image..."
+      - docker push $FRONTEND_REPO_URI:$IMAGE_TAG
+
+      - echo "Creating imagedefinitions.json file"
+      - printf '[{"name":"frontend-app","imageUri":"%s"},{"name":"backend-app","imageUri":"%s"}]' $FRONTEND_REPO_URI:$IMAGE_TAG $BACKEND_REPO_URI:$IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
