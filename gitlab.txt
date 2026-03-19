@@ -1,0 +1,48 @@
+Gitlab is just like mixure of Github and Jenkins
+where in Jenkins we need to install jenkins on our servers to use it where as GitLab is hosted on cloud.
+
+basic gitlab pipeline has ".gitlab-ci.yml" format
+
+build:
+     script:
+	     - echo "step-1"
+		 - echo "step-2"
+		 
+		 
+When we build someting in gitlab it does below things on backend
+
+1. gitlab-runner : Like a instance where it is responsible for running your pipleines
+2.Docker exeutor with light weight image: It took a light weight rubey docker container and ran that job inside that container
+3. getting source from git repo: it will fetch all the things for the gitlab repo example here ".gitlab-ci.yml"
+4. Then it executed the job inside that conatiner and gave you the output "echo "step-1"" echo "step-2"
+
+
+Multi stage :
+
+.gitlab-ci.yml
+
+stages:
+        - build
+		- test
+		- deploy
+build-job:
+     stage: build
+     script:
+	     - echo "step-1"
+		 - echo "step-2"		
+test-job:
+     stage: test
+     script:
+	     - echo "testing"
+Deploy-job:
+     stage: deploy
+     script:
+	     - echo "deploy"
+		 
+		 
+Document link:
+		 
+https://docs.gitlab.com/ci/ 
+
+Youtube link:
+https://www.youtube.com/watch?v=Ip2TA2ijDmA 

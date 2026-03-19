@@ -1,0 +1,23 @@
+
+
+Currently, i am working as DevOps Engineer at Reliance Jio from last 4 years, where I am leading the automation and management of complex 5G Cloud-Native Network Functions (CNFs) on k8s as well as AWS . As the Project Lead for the Flux Ops AI platform, I aslo have worked in cluster upgrade workflows and integrated the Jio MANO platform for end-to-end lifecycle management. These initiatives successfully reduced manual deployment overhead by 40% and cut overall deployment times by 60%.
+
+My core expertise lies in AWS, K8s,Docker and architecting observability stacks using Prometheus and Grafana. I’ve managed environments with over 10,000 nodes, implementing automated remediation for resource exhaustion and database outages to ensure high availability."
+
+
+
+Day to Day activity:
+
+System Health & Monitoring: Start the day by checking Grafana/Prometheus dashboards to ensure production stability and address any overnight alerts.
+
+CI/CD Pipeline Management: Build, maintain, and optimize automated pipelines (using Jenkins or GitLab CI) to ensure seamless code integration and deployment.
+
+Infrastructure as Code (IaC): Provision and manage cloud or on-prem resources using Terraform or Ansible, ensuring all infrastructure is version-controlled.
+
+Container Orchestration: Manage Kubernetes (K3s/K8s) clusters, including scaling deployments, managing Helm charts, and troubleshooting Pod failures (e.g., CrashLoopBackOff).
+
+Environment Support: Provide stable IOT, Staging, and Production environments for Dev and QA teams, resolving configuration mismatches.
+
+Automation & Scripting: Replace repetitive manual tasks with Python or Bash scripts to reduce human error and speed up the "Time-to-Market."
+
+Collaboration & Documentation: Work with NF TAC/Dev teams to create MOPs (Method of Procedure) and technical guides for standardized upgrade processes.

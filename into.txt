@@ -1,7 +1,0 @@
-Thankyou for this oppurtinity. I am currenlty working as an DevOps Engineer and having over 4+ years of experience in building, deploying, and supporting cloud-native applications.
-
-I have hands-on experience with AWS, Docker, Kubernetes,Terraform and I’ve worked extensively on CI/CD pipelines using Jenkins, automating build and deployment processes to improve release efficiency and reliability.
-
-In my current role, I’ve been involved in end-to-end deployment and monitoring of 5G Core Network Functions across multiple environments, including EKS and, collaborating closely with development and QA teams. I’ve also worked on Terraform-based infrastructure provisioning, container security, and troubleshooting production issues.
-
-I enjoy solving deployment and environment-related challenges, improving system stability, and continuously optimizing DevOps processes. I’m now looking for an opportunity where I can work on scalable cloud platforms, deepen my expertise, and contribute to high-impact engineering teams.
