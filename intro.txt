@@ -31,3 +31,28 @@ I have hands-on experience with Git,  AWS, Docker, Kubernetes,Terraform and I’
 In my current role, I’ve been involved in end-to-end deployment and monitoring of 5G Core Network Functions across multiple environments, and, collaborating closely with development and QA teams.
 
 I enjoy solving deployment and environment-related challenges, improving system stability, and continuously optimizing DevOps processes. I’m now looking for an opportunity where I can work on scalable cloud platforms, deepen my expertise, and contribute to high-impact engineering teams.
+
+
+OR
+
+“Good afternoon, and thank you for the opportunity.
+ I’m currently working in Reliance Jio as DevOps Engineer with over 4+ years of experience in deploying and managing cloud-native applications across AWS, Kubernetes, Docker, and OpenShift environments.
+
+Currently, I’m working on 5G Core Network deployments on AWS EKS, collaborating with different teams like the MANO and NF Dev teams for containerized network function (NF) deployments, environment setup, and post-deployment validation.
+
+I have hands-on experience with tools like Jenkins, Terraform, Docker,K8s and GitHub for CI/CD automation and infrastructure management.
+
+I’m passionate about optimizing deployments, improving automation, and ensuring reliability across environments.
+
+I’m now looking for an opportunity where I can contribute my DevOps expertise to more scalable, production-grade cloud projects and continue growing technically.”
+
+--------------------------------------------------------
+
+“In my current role as a DevOps Engineer, my daily work mainly involves managing deployments and maintaining 5G Core Network functions on On-primises /AWS EKS.
+I start by checking the health of pods and services using Kubernetes commands and monitoring tools like Grafana or CloudWatch.
+I also collaborate with the MANO and NF Dev teams to troubleshoot any issues during deployment.
+A big part of my work is writing and maintaining Helm charts, updating YAML manifests, and handling container images through ECR.
+For automation, I use Jenkins for CI/CD and Terraform for infrastructure provisioning.
+Toward the end of the day, I document my work and update the team on progress or issues during our stand-up meetings.”
+
+
