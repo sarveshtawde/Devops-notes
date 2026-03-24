@@ -21,3 +21,13 @@ Environment Support: Provide stable IOT, Staging, and Production environments fo
 Automation & Scripting: Replace repetitive manual tasks with Python or Bash scripts to reduce human error and speed up the "Time-to-Market."
 
 Collaboration & Documentation: Work with NF TAC/Dev teams to create MOPs (Method of Procedure) and technical guides for standardized upgrade processes.
+
+OR 
+
+Thankyou for this oppurtinity. I am currenlty working as an DevOps Engineer and having over 4+ years of experience in building, deploying, and supporting cloud-native applications.
+
+I have hands-on experience with Git,  AWS, Docker, Kubernetes,Terraform and I’ve worked extensively on CI/CD pipelines using Jenkins, automating build and deployment processes to improve release efficiency and reliability.
+
+In my current role, I’ve been involved in end-to-end deployment and monitoring of 5G Core Network Functions across multiple environments, and, collaborating closely with development and QA teams.
+
+I enjoy solving deployment and environment-related challenges, improving system stability, and continuously optimizing DevOps processes. I’m now looking for an opportunity where I can work on scalable cloud platforms, deepen my expertise, and contribute to high-impact engineering teams.
