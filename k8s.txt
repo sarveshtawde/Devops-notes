@@ -97,7 +97,7 @@ Q) Configuration and Storage
 
 ConfigMap: Stores non-sensitive configuration data in key-value pairs to be injected into Pods as environment variables or files.
 
-Secret: Stores sensitive data (like passwords, tokens, keys) and provides mechanisms to securely inject them into Pods.
+Secret: Stores sensitive data (like passwords, tokens, keys) and provides mechanisms to securely inject them into Pods. base64 encoded
 
 PersistentVolume (PV): A piece of network storage (e.g., AWS EBS) provisioned in the cluster, independent of a Pod's lifecycle.
 
@@ -218,7 +218,47 @@ A: Role-Based Access Control (RBAC) is the standard Kubernetes security mechanis
 
 
 
-Q) How to upgarde the k8s cluster in production (k8s v:1.30 --> v1.31)
+Q) How to upgarde the k8s cluster in production (k8s v:1.34 --> v1.35)
+
+1. Pre-checks (don’t skip)
+Read release notes for breaking changes
+Ensure all nodes/components are within 1 version skew
+Backup:
+etcd snapshot
+critical manifests / Helm releases
+
+Upgrade Control Plane (one at a time)
+
+If using kubeadm:
+# On control-plane node
+sudo apt-get update
+sudo apt-get install -y kubeadm=1.35.x
+
+kubeadm upgrade plan
+kubeadm upgrade apply v1.35.x
+
+Then upgrade kubelet + kubectl:
+
+sudo apt-get install -y kubelet=1.35.x kubectl=1.35.x
+sudo systemctl daemon-reexec
+sudo systemctl restart kubelet
+
+Upgrade Worker Nodes (rolling)\
+
+kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
+sudo apt-get install -y kubeadm=1.35.x
+kubeadm upgrade node
+
+sudo apt-get install -y kubelet=1.35.x kubectl=1.35.x
+sudo systemctl restart kubelet
+
+kubectl uncordon <node>
+
+kubectl get nodes
+kubectl get pods -A
+kubectl version
+
+No, you should NOT upgrade directly from v1.33 → v1.35.
 
 Pre-checks:
 

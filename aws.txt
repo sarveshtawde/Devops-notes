@@ -371,6 +371,21 @@ Amazon Elastic Compute Cloud (Amazon EC2) offers the broadest and deepest comput
 b) Amazon Lightsail:
 Amazon Lightsail is the easiest way to get started with Amazon Web Services (AWS) for anyone who needs to build websites or web applications. It includes everything you need to launch your project quickly—instances (virtual private servers), container services, managed databases, content delivery network (CDN) distributions, load balancers, SSD-based block storage, static IP addresses, DNS management of registered domains, and resource snapshots (backups)—for a low, predictable monthly price.
 
+Lambda → Run functions without managing servers
+
+Fargate → Run containers without managing servers
+
+🔍 Key Differences
+Feature	                    AWS Lambda	                                              AWS Fargate
+Abstraction level	       Function-level	                                         Container-level
+Input	                       Events (API calls, S3, etc.)	                        Docker containers
+Runtime control	       Limited                                                 	Full control inside container
+Execution time	       Max ~15 minutes	                                    No hard limit
+Scaling	                       Automatic per request	                            Scales containers
+Startup	                  Cold starts possible	                               Slower container startup
+Use case	                  Short tasks, APIs	                                   Long-running services
+Pricing	                       Per execution time	                              Per CPU & memory usage
+
 
 c) ECS: (Elastic Container Service)
 

@@ -1,13 +1,17 @@
+docker run -itd  --name my-container  -p 8080:80 -v /host/path:/container/path -e MY_VAR=value nginx
+
 Q) Multi-Stage Dockerfile Example
 
 ######################################
 FROM golang:1.21-bullseye AS builder
-WORKDIR /app
-COPY main.go .
-FROM ubuntu:22.04
-WORKDIR /usr/bin
-COPY --from=builder /app/hello-ubuntu-app .
-ENTRYPOINT ["/usr/bin/hello-ubuntu-app"]
+WORKDIR /app                                                 # Set working directory inside the container to /app
+COPY main.go .                                                 # Copy main.go from your local machine into /app inside the container
+RUN go build -o hello-ubuntu-app main.go   # build the Go binary
+
+FROM ubuntu:22.04                                             # Start a new stage using a minimal Ubuntu 22.04 image (final runtime image)
+WORKDIR /usr/bin                                               # Set working directory in the final container to /usr/bin
+COPY --from=builder /app/hello-ubuntu-app .  # Copy the compiled binary from the builder stage into this stage
+ENTRYPOINT ["/usr/bin/hello-ubuntu-app"]       # Define the default command to run when the container starts
 
 ##################################
 
