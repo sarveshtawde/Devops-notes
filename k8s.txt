@@ -391,3 +391,16 @@ spec:
 		
 for HPA we need metrics to be installed
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+By default:
+
+Scale UP → fast (~15 sec)
+Scale DOWN → slow (~5 minutes)
+we can change it 
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 15
