@@ -199,21 +199,62 @@ spec:
       targetPort: 80
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Q) How to upgarde the k8s cluster in production (k8s v:1.30 --> v1.31)
+Q) How to upgarde the k8s cluster in production (k8s v:1.34 --> v1.35)
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. Check current version  
+"kubectl get nodes"  
+"kubectl version --short"
 
-Pre-checks:
+2. Check available upgrade plan  
+"sudo kubeadm upgrade plan"
 
-1. We can have multiple environment in the organizations like unit,stage,pre and Prod
-2. Before upgrading the k8s cluster below pre-requisites we need to follow
+3. Drain the control plane node  
+"kubectl drain <master-node-name> --ignore-daemonsets --delete-emptydir-data"
 
-a) cordon nodes (Cordon nodes means marking a node as unschedulable, so no new workloads are placed on it, while existing workloads keep running.) so inform team regarding the same.
-b) Read new release notes 
-c) Make sure that you are sure about the new k8s release upgrade as if you upgrade the cluster you cannot downgrade it back , you need to do then fresh deployment of cluster. So before procceding for upgrade in production make sure to test the release in other environments (unit,stage,pre) before going on production.
-d) Control plain and nodes should be on same version
-e) Cluster auto scaller version should be same as control plain and nodes
-f) Alleast 5 availabile Ip address (subnet) ,during k8s cluster creation
-g) kubelet should match version of control plain
+4. Upgrade kubeadm tool  
+"sudo apt update && sudo apt install -y kubeadm=1.35.x-00"
+
+5. Verify kubeadm version  
+"kubeadm version"
+
+6. Apply control plane upgrade  
+"sudo kubeadm upgrade apply v1.35.x"
+
+7. Upgrade kubelet and kubectl  
+"sudo apt install -y kubelet=1.35.x-00 kubectl=1.35.x-00"
+
+8. Restart kubelet  
+"sudo systemctl daemon-reexec"  
+"sudo systemctl restart kubelet"
+
+9. Uncordon control plane node  
+"kubectl uncordon <master-node-name>"
+
+************************
+Worker Node Upgrade
+************************
+
+10. Drain worker node  
+"kubectl drain <worker-node-name> --ignore-daemonsets --delete-emptydir-data"
+
+11. Upgrade kubeadm on worker  
+"sudo apt update && sudo apt install -y kubeadm=1.35.x-00"
+
+12. Upgrade node config  
+"sudo kubeadm upgrade node"
+
+13. Upgrade kubelet and kubectl  
+"sudo apt install -y kubelet=1.35.x-00 kubectl=1.35.x-00"
+
+14. Restart kubelet  
+"sudo systemctl restart kubelet"
+
+15. Uncordon worker node  
+"kubectl uncordon <worker-node-name>"
+
+16. Verify cluster after upgrade  
+"kubectl get nodes"  
+"kubectl get pods -A"
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Q) Liveness vs Readiness 
@@ -305,6 +346,51 @@ initContainers:
 One-line real example (interview bonus)
 
 “We use an init container to wait for the database, readiness probe to stop traffic during DB outages, and liveness probe to restart stuck pods.”
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+K8s cluster creation from scratch
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. Disable swap  "sudo swapoff -a"
+
+2. Enable kernel settings  
+"sudo modprobe br_netfilter"  
+"echo 'net.bridge.bridge-nf-call-iptables=1' | sudo tee -a /etc/sysctl.conf"  
+"echo 'net.ipv4.ip_forward=1' | sudo tee -a /etc/sysctl.conf"  
+"sudo sysctl -p"
+
+3. Install Container runtime  
+"sudo apt update && sudo apt install -y containerd"
+
+4. Configure containerd  
+"containerd config default | sudo tee /etc/containerd/config.toml"  
+"sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml"  
+"sudo systemctl restart containerd"
+
+5. Add Kubernetes repo  
+"sudo apt install -y apt-transport-https curl"  
+"curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo tee /etc/apt/keyrings/kubernetes-apt-keyring.asc"  
+"echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.asc] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list"
+
+6. Install Kubernetes tools  
+"sudo apt update && sudo apt install -y kubelet kubeadm kubectl"
+
+7. Initialize Master Node  
+"sudo kubeadm init --pod-network-cidr=192.168.0.0/16"
+
+8. Configure kubectl  
+"mkdir -p $HOME/.kube"  
+"sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config"  
+"sudo chown $(id -u):$(id -g) $HOME/.kube/config"
+
+9. Install Network Plugin (CNI)  
+"kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml"
+
+10. Join Worker Nodes  
+"kubeadm join <MASTER-IP>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>"
+
+11. Verify cluster  
+"kubectl get nodes"
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Rollingupdate

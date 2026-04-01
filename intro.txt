@@ -1,15 +1,14 @@
 “Good afternoon, and thank you for the opportunity.
- I’m currently working in Reliance Jio as DevOps Engineer with over 4.4+ years of experience in deploying and managing cloud-native applications across AWS, Kubernetes, Docker  environments.
+ I’m currently working in Reliance Jio as DevOps Engineer with over 4.5+ years of experience in deploying and managing cloud-native applications across AWS, Kubernetes, Docker  environments.
 
 Currently, I’m working on 5G Core Network deployments on AWS and on-preminses , collaborating with different teams like the QA and TAC, Dev teams for containerized network function (NF) deployments, environment setup, and post-deployment validation.
 
-I have hands-on experience with tools like Docker,K8s,Gitlab, Terraform, AWS and Git for deployment,automation and infrastructure management.
+I have hands-on experience with tools like Docker,K8s, Terraform, AWS and Git for deployment,automation and infrastructure management.
 
-I’m passionate about optimizing deployments, improving automation, and ensuring reliability across environments.
 
 I’m now looking for an opportunity where I can contribute my DevOps expertise to more scalable, production-grade cloud projects and continue growing technically.”
 
---------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 “In my current role as a DevOps Engineer, my daily work mainly involves managing deployments and maintaining 5G Core Network functions on On-primises /AWS .
 I start by checking the health of pods and services using Kubernetes commands and monitoring tools like Grafana or CloudWatch.
