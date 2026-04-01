@@ -22,7 +22,8 @@ Q) Kubernetes Cluster Diagram
 | +-----------+  +-----------+  +-----------+
 
 
------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 Q) Kubernetes Deployment Strategies
 
 Rolling Update : The default strategy that gradually replaces old Pods with new ones, ensuring minimal downtime by controlling maximum availability and surge.
@@ -33,7 +34,8 @@ Canary : A progressive delivery approach that exposes a new version to a small p
 
 Shadow : The new version (shadow) receives a copy of real production traffic, but its responses are discarded, allowing for performance testing without affecting end-users.
 
------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 Q) Kubernetes Service Types
 
@@ -65,6 +67,9 @@ spec:
 
 kubectl apply -f quota.yaml
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 Q) Kinds used 
 
 Pod: The smallest deployable unit; encapsulates one or more containers that share networking and storage.
@@ -81,7 +86,8 @@ Job: Creates one or more Pods and ensures that the tasks inside the Pods run to 
 
 CronJob: Creates Jobs on a repeating schedule (e.g., nightly backups or scheduled cleanup scripts).
 
---------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 Q) Networking and Service Discovery
 
@@ -92,7 +98,8 @@ Ingress: Manages external access to services within a cluster, typically providi
 
 Endpoint: Automatically populated by Kubernetes, listing the current IP addresses of the Pods backing a Service.
 
--------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 Q) Configuration and Storage
 
@@ -106,7 +113,8 @@ PersistentVolumeClaim (PVC): A request by a Pod for a specific amount and type o
 
 StorageClass: Provides a way for administrators to define different tiers of storage available in the cluster (e.g., fast SSD vs. standard HDD).
 
----------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 Q) Cluster-Level Resources
 
@@ -114,8 +122,12 @@ Node: Represents a worker machine (VM or physical) in the cluster where Pods are
 
 Namespace: Provides a way to virtually partition cluster resources into non-overlapping groups (e.g., separating Dev, QA, and Prod environments).
 
-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 k8s commands
+
+
+kubectl create deployment --image=nginx -o yaml >> deploy.yaml
+
 
 kubectl apply -f xyz.yaml
 kubectl get pod
@@ -128,10 +140,10 @@ kubectl rollout (Checks the status, pauses, resumes, undoes, or views the histor
 kubectl create configmap app-config-literal \  --from-literal=log_level=INFO \ --from-literal=feature_flag=true
 kubectl create configmap app-config-file \ --from-file=app.properties
 
------------------------------------------------------------------------------------------------------------------------------------
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 k8s yaml example
----
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 apiVersion: apps/v1
 kind: Deployment
@@ -164,8 +176,10 @@ spec:
           requests:
             cpu: "250m"  # 0.25 CPU core
             memory: "128Mi"
----
+			
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # 2. Service: Exposes the Deployment internally for communication
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 apiVersion: v1
 kind: Service
@@ -183,48 +197,16 @@ spec:
       port: 80
       # The port the target container is listening on (must match containerPort above)
       targetPort: 80
-	  
-	  
-	----------------------------------------------------------------------
-	
-Q1. Describe the K8s Master/Worker Architecture.
-A: K8s uses a Control Plane (Master) and Worker Nodes. The Control Plane manages the cluster (scheduling, desired state). Worker Nodes run the actual Pods and container workloads.
 
-Q2. What is the role of etcd?
-A: etcd is the highly available, distributed key-value store. It acts as the single source of truth for the entire cluster, storing the complete configuration and the current state of all objects (Pods, Deployments, Services).
-
-Q3. What is the difference between a Deployment and a StatefulSet?
-A: Deployment manages stateless applications (all Pods are interchangeable). StatefulSet manages stateful applications (databases); its Pods have stable network identities, ordered scaling/termination, and unique Persistent Volumes.
-
-Q4. How does a Service connect to Pods?
-A: A Service uses Labels and Selectors. The Service configuration defines a selector (e.g., app: my-app) that matches the labels attached to the target Pods, dynamically directing traffic to them.
-
-Q5. Explain the purpose of a Namespace.
-A: A Namespace provides a mechanism for virtual clustering within a single physical cluster. It is used to logically divide cluster resources among different teams, applications, or environments (Dev/QA/Prod), providing scope for resource quotas and access control (RBAC).
-
-Q6. What is a Pod? Why not run a container directly?
-A: A Pod is the smallest deployable unit. It encapsulates one or more containers, sharing a single network namespace and storage. We use Pods because they allow closely related containers (like an application and a logging sidecar) to communicate via localhost.
-
-Q7. How does an external request reach a Pod (via LoadBalancer Service)?
-A: External traffic hits the Cloud Load Balancer (provisioned by the LoadBalancer Service type), which forwards traffic to the NodePort opened on the Worker Nodes, which then forwards the traffic to the correct Pod via Kube-proxy rules.
-
-Q8. What is the purpose of a ConfigMap and a Secret?
-A: ConfigMap stores non-sensitive configuration data (e.g., application settings, command-line arguments). Secret stores sensitive data (e.g., passwords, API keys). Both inject this data into Pods as environment variables or files.
-
-Q9. What is the difference between a RollingUpdate and a Recreate deployment strategy?
-A: RollingUpdate (default) gradually replaces old Pods with new ones, maintaining service availability (zero-downtime). Recreate terminates all old Pods before creating any new ones, resulting in a brief downtime.
-
-Q10. What is RBAC?
-A: Role-Based Access Control (RBAC) is the standard Kubernetes security mechanism. It regulates access by defining Roles (sets of permissions) and then using RoleBindings to grant those roles to specific users, groups, or Service Accounts.
-
-
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Q) How to upgarde the k8s cluster in production (k8s v:1.30 --> v1.31)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Pre-checks:
 
 1. We can have multiple environment in the organizations like unit,stage,pre and Prod
 2. Before upgrading the k8s cluster below pre-requisites we need to follow
+
 a) cordon nodes (Cordon nodes means marking a node as unschedulable, so no new workloads are placed on it, while existing workloads keep running.) so inform team regarding the same.
 b) Read new release notes 
 c) Make sure that you are sure about the new k8s release upgrade as if you upgrade the cluster you cannot downgrade it back , you need to do then fresh deployment of cluster. So before procceding for upgrade in production make sure to test the release in other environments (unit,stage,pre) before going on production.
@@ -233,8 +215,9 @@ e) Cluster auto scaller version should be same as control plain and nodes
 f) Alleast 5 availabile Ip address (subnet) ,during k8s cluster creation
 g) kubelet should match version of control plain
 
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Q) Liveness vs Readiness 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Liveness probe checks whether the application is still running.
 If it fails, Kubernetes restarts the container.
@@ -299,9 +282,9 @@ Startup still in progress
 
 Temporary overload
 
- --------------------------------------
- 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Q) init container
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 An init container runs before the main application container starts.
 It must complete successfully before the pod becomes ready.
@@ -323,8 +306,9 @@ One-line real example (interview bonus)
 
 “We use an init container to wait for the database, readiness probe to stop traffic during DB outages, and liveness probe to restart stuck pods.”
 
-
-Rollingupdate -------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Rollingupdate
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 apiVersion: apps/v1
 kind: Deployment
@@ -353,8 +337,9 @@ spec:
         imagePullPolicy: Always
         name: nginx
 		
-
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 In Kubernetes, an Autoscaler automatically adjusts resources (usually Pods or Nodes) based on demand, so your app can handle traffic efficiently without manual scaling.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 1. Horizontal Pod Autoscaler (HPA)
 Scales number of Pods
@@ -367,7 +352,9 @@ Less commonly used in production with HPA together
 3. Cluster Autoscaler
 Scales nodes (VMs) in your cluster
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -----------------------HPA yaml-------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -404,3 +391,78 @@ we can change it
         - type: Percent
           value: 50
           periodSeconds: 15
+		  
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  
+-----------Kubernetes Ingress-------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ingress is an API object that manages external HTTP/HTTPS access to services inside your Kubernetes cluster.
+
+1. A smart router for incoming traffic
+2. Handles domain-based routing, path-based routing, and TLS (HTTPS)
+
+Deployment ---will connect with --- service by 
+
+selector:
+    matchLabels:
+      app: hello-app
+	  
+then --- service get connect to ingress by 
+
+metadata:
+  name: hello-service
+  
+  
+ingress.yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-ingress
+spec:
+  rules:
+  - host: hello.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-service
+            port:
+              number: 80
+			  
+			  
+			  
+	----------------------------------------------------------------------
+	
+Q1. Describe the K8s Master/Worker Architecture.
+A: K8s uses a Control Plane (Master) and Worker Nodes. The Control Plane manages the cluster (scheduling, desired state). Worker Nodes run the actual Pods and container workloads.
+
+Q2. What is the role of etcd?
+A: etcd is the highly available, distributed key-value store. It acts as the single source of truth for the entire cluster, storing the complete configuration and the current state of all objects (Pods, Deployments, Services).
+
+Q3. What is the difference between a Deployment and a StatefulSet?
+A: Deployment manages stateless applications (all Pods are interchangeable). StatefulSet manages stateful applications (databases); its Pods have stable network identities, ordered scaling/termination, and unique Persistent Volumes.
+
+Q4. How does a Service connect to Pods?
+A: A Service uses Labels and Selectors. The Service configuration defines a selector (e.g., app: my-app) that matches the labels attached to the target Pods, dynamically directing traffic to them.
+
+Q5. Explain the purpose of a Namespace.
+A: A Namespace provides a mechanism for virtual clustering within a single physical cluster. It is used to logically divide cluster resources among different teams, applications, or environments (Dev/QA/Prod), providing scope for resource quotas and access control (RBAC).
+
+Q6. What is a Pod? Why not run a container directly?
+A: A Pod is the smallest deployable unit. It encapsulates one or more containers, sharing a single network namespace and storage. We use Pods because they allow closely related containers (like an application and a logging sidecar) to communicate via localhost.
+
+Q7. How does an external request reach a Pod (via LoadBalancer Service)?
+A: External traffic hits the Cloud Load Balancer (provisioned by the LoadBalancer Service type), which forwards traffic to the NodePort opened on the Worker Nodes, which then forwards the traffic to the correct Pod via Kube-proxy rules.
+
+Q8. What is the purpose of a ConfigMap and a Secret?
+A: ConfigMap stores non-sensitive configuration data (e.g., application settings, command-line arguments). Secret stores sensitive data (e.g., passwords, API keys). Both inject this data into Pods as environment variables or files.
+
+Q9. What is the difference between a RollingUpdate and a Recreate deployment strategy?
+A: RollingUpdate (default) gradually replaces old Pods with new ones, maintaining service availability (zero-downtime). Recreate terminates all old Pods before creating any new ones, resulting in a brief downtime.
+
+Q10. What is RBAC?
+A: Role-Based Access Control (RBAC) is the standard Kubernetes security mechanism. It regulates access by defining Roles (sets of permissions) and then using RoleBindings to grant those roles to specific users, groups, or Service Accounts.
