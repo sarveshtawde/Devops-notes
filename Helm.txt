@@ -1,0 +1,235 @@
+Helm chart is a package format used to define, install, and manage applications on a Kubernetes cluster using Helm.
+
+In simple terms:
+
+Think of a Helm chart like a **ready-made blueprint** for deploying an application on Kubernetes.
+
+Instead of manually writing many YAML files for deployment, services, configs, etc., a Helm chart bundles everything together so you can deploy with a single command.
+
+
+### 🔹 What does a Helm chart contain?
+
+A typical Helm chart includes:
+
+* **Chart.yaml** → Basic info (name, version)
+* **values.yaml** → Default configuration values
+* **templates/** → Kubernetes YAML templates (Deployment, Service, etc.)
+* **charts/** → Dependencies (other charts if needed)
+
+---
+
+### 🔹 Why use Helm charts?
+
+* ✅ Simplifies deployment
+* ✅ Reusable and configurable
+* ✅ Easy upgrades and rollbacks
+* ✅ Version control for applications
+
+---
+
+### 🔹 Example:
+
+Instead of manually creating multiple Kubernetes files, you can run:
+
+```bash
+helm install my-app ./my-chart
+```
+
+And Helm will deploy the entire application for you.
+
+
+Helm Commands:
+
+
+#######################basic helm commands ########################
+
+helm create my-chart            # Create a new Helm chart
+
+helm install my-release ./my-chart    # Install/deploy application
+
+helm install my-release ./my-chart -f values.yaml    # Install with custom values
+
+helm list                       # List all Helm releases
+
+helm status my-release          # Check status of a release
+
+helm upgrade my-release ./my-chart    # Upgrade an existing release
+
+helm rollback my-release 1      # Rollback to previous version (revision 1)
+
+helm history my-release         # View release history
+
+helm uninstall my-release       # Uninstall/delete a release
+
+helm lint my-chart              # Validate chart syntax
+
+helm install my-release ./my-chart --dry-run --debug   # Dry run (test without deploying)
+
+############################################################################
+
+#Chart Management
+
+helm create <name>                        # Creates a chart directory along with the common files and directories used in a chart.
+helm package <chart-path>            # Packages a chart into a versioned chart archive file.
+helm lint <chart>                            # Run tests to examine a chart and identify possible issues:
+helm show all <chart>                   # Inspect a chart and list its contents:
+helm show values <chart>             # Displays the contents of the values.yaml file
+helm pull <chart>                          # Download/pull chart
+helm pull <chart> --untar=true     # If set to true, will untar the chart after downloading it
+helm pull <chart> --verify               # Verify the package before using it
+helm pull <chart> --version <number>     # Default-latest is used, specify a version constraint for the chart version to use
+helm dependency list <chart>            # Display a list of a chart’s dependencies:
+
+
+# Install and Uninstall Apps
+
+helm install <name> <chart>                                                 # Install the chart with a name
+helm install <name> <chart> --namespace <namespace>     # Install the chart in a specific namespace
+helm install <name> <chart> --set key1=val1,key2=val2      # Set values on the command line (can specify multiple or separate values with commas)
+helm install <name> <chart> --values <yaml-file/url>         # Install the chart with your specified values
+helm install <name> <chart> --dry-run --debug                  # Run a test installation to validate chart (p)
+helm install <name> <chart> --verify                                # Verify the package before using it
+helm install <name> <chart> --dependency-update         # update dependencies if they are missing before installing the chart
+helm uninstall <name>                                                     # Uninstalls a release from the current (default) namespace
+helm uninstall <release-name> --namespace <namespace>  # Uninstalls a release from the specified namespace
+
+
+# Perform App Upgrade and Rollback
+
+helm upgrade <release> <chart>                                       # Upgrade a release
+helm upgrade <release> <chart> --rollback-on-failure        # If set, upgrade process rolls back changes made in case of failed upgrade.
+helm upgrade <release> <chart> --dependency-update          # update dependencies if they are missing before installing the chart
+helm upgrade <release> <chart> --version <version_number>   # specify a version constraint for the chart version to use
+helm upgrade <release> <chart> --values                        # specify values in a YAML file or a URL (can specify multiple)
+helm upgrade <release> <chart> --set key1=val1,key2=val2    # Set values on the command line (can specify multiple or separate valuese)
+helm upgrade <release> <chart> --force                       # Force resource updates through a replacement strategy
+helm rollback <release> <revision>                                 # Roll back a release to a specific revision
+helm rollback <release> <revision>  --cleanup-on-fail     # Allow deletion of new resources created in this rollback when rollback fails
+
+
+#List, Add, Remove, and Update Repositories
+
+helm repo add <repo-name> <url>   # Add a repository from the internet:
+helm repo list                    # List added chart repositories
+helm repo update                  # Update information of available charts locally from chart repositories
+helm repo remove <repo_name>      # Remove one or more chart repositories
+helm repo index <DIR>             # Read the current directory and generate an index file based on the charts found.
+helm repo index <DIR> --merge     # Merge the generated index with an existing index file
+helm search repo <keyword>        # Search repositories for a keyword in charts
+helm search hub <keyword>         # Search for charts in the Artifact Hub or your own hub instance
+
+
+#Helm Release monitoring
+
+helm list                       # Lists all of the releases for a specified namespace, uses current namespace context if namespace not specified
+helm list --all                 # Show all releases without any filter applied, can use -a
+helm list --all-namespaces      # List releases across all namespaces, we can use -A
+helm list -l key1=value1,key2=value2 # Selector (label query) to filter on, supports '=', '==', and '!='
+helm list --date                # Sort by release date
+helm list --deployed            # Show deployed releases. If no other is specified, this will be automatically enabled
+helm list --pending             # Show pending releases
+helm list --failed              # Show failed releases
+helm list --uninstalled         # Show uninstalled releases (if 'helm uninstall --keep-history' was used)
+helm list --superseded          # Show superseded releases
+helm list -o yaml               # Prints the output in the specified format. Allowed values: table, json, yaml (default table)
+helm status <release>           # This command shows the status of a named release.
+helm status <release> --revision <number>   # if set, display the status of the named release with revision
+helm history <release>          # Historical revisions for a given release.
+helm env                        # Env prints out all the environment information in use by Helm.
+
+
+#Download Release Information
+
+helm get all <release>      # A human readable collection of information about the notes, hooks, supplied values, and generated manifest file of the given release.
+helm get hooks <release>    # This command downloads hooks for a given release. Hooks are formatted in YAML and separated by the YAML '---\n' separator.
+helm get manifest <release> # A manifest is a YAML-encoded representation of the Kubernetes resources that were generated from this release's chart(s). If a chart is dependent on other charts, those resources will also be included in the manifest.
+helm get notes <release>    # Shows notes provided by the chart of a named release.
+helm get values <release>   # Downloads a values file for a given release. use -o to format output
+
+
+#Plugin Management
+
+helm plugin install <path/url>      # Install plugins
+helm plugin list                    # View a list of all installed plugins
+helm plugin update <plugin>         # Update plugins
+helm plugin uninstall <plugin>      # Uninstall a plugin
+
+
+
+Example:
+
+my-demo-chart/
+├── Chart.yaml
+├── values.yaml
+└── templates/
+    ├── deployment.yaml
+    └── service.yaml
+	
+
+Chart.yaml
+
+apiVersion: v2
+name: my-demo-chart
+description: A simple demo Helm chart
+version: 0.1.0
+appVersion: "1.0"
+
+values.yaml
+
+replicaCount: 2
+
+image:
+  repository: nginx
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  
+
+templates/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+			
+
+templates/service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-service
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: nginx
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 80
+	  
+	  
+How to Run This Demo
+
+helm install my-demo ./my-demo-chart   # Deploy chart
+helm list                              # Check deployment
+kubectl get pods                       # Verify pods
+kubectl get svc                        # Verify service
