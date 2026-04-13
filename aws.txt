@@ -10,8 +10,7 @@
 -------------------------------------------------------
    Availability Zone A        Availability Zone B
 -------------------------------------------------------
-|   EC2     |   RDS     |   EC2     |   RDS          |
-|   ALB     |           |   ALB     |               |
+|   EC2     |   RDS     |           EC2     |   RDS          |
 -------------------------------------------------------
          |                   |
          +------ VPC --------+
@@ -54,15 +53,15 @@
 
 ```
 --------------------- VPC -----------------------
-|                                               |
-|  Public Subnet        Private Subnet           |
-|  -------------        --------------           |
-|  |  EC2 + ALB |       |  EC2 + App |           |
-|  |            |       |            |           |
-|  -------------        --------------           |
-|       |                     |                 |
-|  Internet GW           NAT Gateway             |
-|       |                     |                 |
+|                                                                       |
+|  Public Subnet        Private Subnet                |
+|  -------------        --------------                      |
+|  |  EC2 + ALB |       |  EC2 + App    |                |
+|  |                    |       |                       |                |
+|  -------------        --------------                      |
+|       |                     |                         |                |
+|  Internet GW           NAT Gateway                  |
+|       |                     |                        |
 -------------------------------------------------
 ```
 
@@ -86,7 +85,7 @@
 | ------- | ------------------------- |
 | **ALB** | HTTP/HTTPS, microservices |
 | **NLB** | High performance, TCP     |
-| **CLB** | Legacy                    |
+| **Classic LB** | Legacy                    |
 
 ```
 User → ALB → EC2 (AZ-A)
@@ -139,9 +138,6 @@ EC2 → IAM Role → S3 Access
     "Resource": "arn:aws:s3:::my-bucket/*"
   }]
 }
-```
-
----
 
 ## Q) AWS Storage Types Comparison
 
@@ -152,7 +148,6 @@ EC2 → IAM Role → S3 Access
 | EFS     | File    | Shared storage       |
 | Glacier | Archive | Long-term backup     |
 
----
 
 ## Q) S3 Architecture
 
@@ -170,6 +165,16 @@ S3 Bucket
 * Lifecycle policies
 * Cross-region replication
 
+Q ) S3 storage types in Amazon S3:
+
+S3 Standard → Frequent access, fast, high cost
+S3 Intelligent-Tiering → Auto moves data based on usage
+S3 Standard-IA → Infrequent access, lower cost, retrieval fee
+S3 One Zone-IA → Cheaper, stored in one AZ
+S3 Glacier Instant → Archive with instant access
+S3 Glacier Flexible → Archive, retrieval in minutes–hours
+S3 Glacier Deep Archive → Cheapest, retrieval in hours
+S3 Express One Zone → Ultra-fast, single AZ
 ---
 
 ## Q) AWS Deployment Strategies
@@ -319,180 +324,205 @@ RDS (Multi-AZ)
 ---
 https://www.youtube.com/watch?v=OGYEXGy8ca4
 
-Aws Services explainination:
 
-Route 53 : 
-1) When user access for example "amazon.com", then in route53 this dns is configured here. Basically route53 is DNS and traffic manangement service. 
-2) It also allows us to setup healthchecks for the instances for example we have 10instances , so it will check which instance is healthy and route that traffic to that instance when users searches amazon.com. Typicall we don't point it directly on servers we point it towards a load balancer.
-3) We can have geographic ,latency or failover based routings throught route53
+# 🚀 AWS Services – Interview Notes (With Examples)
 
+🌐 Core Architecture Flow (MOST IMPORTANT)
 
-Amazon S3 bucket:
-1) It is a simple storage service in which we can store images,html files etc, in this case the amazon.com website html and images files
 
+#####Amazon Route 53
 
-AWS cloud Front:
-1) If a user from india tries to fetch some content from amazon.com but if your website data is stored in s3 bucket in USA, then user will face some delay in fetching those details.
-2) AWS Cloud Front does regional caching , which means that it replicates all the data in the s3 bucket of your website on different regions all acoss the world. 
-3) So when user from any region tries to get to website ,it will get details from the neariest cloud front distribution.
+DNS service → converts domain (amazon.com) → IP / Load Balancer
+Supports health checks & routing (latency, geo, failover)
+* 👉 *Example: If one region (US) goes down, Route53 automatically redirects users to India servers
 
+---
 
-Api :
-a) LoadBalancer
-1) it is used to horizontally scale your application , if i am a who wants to get something through api "get amazon.com"then loadbalancer will route that traffic to one of the instance accordingly.
+### Amazon CloudFront
 
-b) API gateway
-1) It is basically a frount door of AWS , for example by route53 you can send request to api gatway then api gateway will route that request to compute and also all other type of AWS services as well
-2) By using this we can also restrict specific user requests limits for example 1000 requests, also user permissions, throughtling
+* Caches content at edge locations worldwide**
+* Reduces latency for global users
+* 👉 *Example:* User in India loads website → gets images from Mumbai edge instead of US S3
 
+---
 
-WAF (Web Application Firewall):
-It helps in protecting from BOT attacks where someone tries to scan your endpoints to find out different types of varnibilities 
-this is added before loadbalancer 
+******************************************🔐 Security Layer***************************************
 
-AWS Shield:
-IF we wnat to get protection from DAAS (distributed analyes attack)
-this is added before loadbalancer 
+#### AWS WAF (Web Application Firewall)
 
-Certificate Manager:
-It allows you to ensure that your endpoints in Route53 have a vaild certificate 
+* Protects from **SQL injection, XSS, bots**
+* 👉 *Example:* Blocks malicious requests trying to hack login forms
 
+#### AWS Shield
 
-AWS Cognito:
-It create a user pool in which user needs to be register , then you become a valid user and when that user tries to login and if it is a valid user then token is genereted and send to Api (loadbalancer, apigateway) tell it that he is valid  user and to proceed ahead with the regquest.
-basically it does authentication and authorization
+* Protects from **DDoS attacks**
+* 👉 *Example:* Prevents traffic flood that tries to crash your website
 
-Compute:
+---
 
-a) Ec2:
-Amazon Elastic Compute Cloud (Amazon EC2) offers the broadest and deepest compute platform, with over 600 instance types and a choice of the latest processors, storage, networking, operating systems, and purchase models to help you best match the needs of your workload.
+***************************************🔗 API & Traffic Handling***************************************
 
+### Elastic Load Balancing
 
-b) Amazon Lightsail:
-Amazon Lightsail is the easiest way to get started with Amazon Web Services (AWS) for anyone who needs to build websites or web applications. It includes everything you need to launch your project quickly—instances (virtual private servers), container services, managed databases, content delivery network (CDN) distributions, load balancers, SSD-based block storage, static IP addresses, DNS management of registered domains, and resource snapshots (backups)—for a low, predictable monthly price.
+* Distributes traffic across multiple servers
+* Ensures **high availability**
+* 👉 *Example:* 10 users → distributed across 5 EC2 servers
 
-Lambda → Run functions without managing servers
+### Amazon API Gateway
 
-Fargate → Run containers without managing servers
+* Entry point for APIs
+* Supports **auth, throttling, request validation**
+* 👉 *Example:* Limit user to 1000 API calls/day
 
-🔍 Key Differences
-Feature	                    AWS Lambda	                                              AWS Fargate
-Abstraction level	       Function-level	                                         Container-level
-Input	                       Events (API calls, S3, etc.)	                        Docker containers
-Runtime control	       Limited                                                 	Full control inside container
-Execution time	       Max ~15 minutes	                                    No hard limit
-Scaling	                       Automatic per request	                            Scales containers
-Startup	                  Cold starts possible	                               Slower container startup
-Use case	                  Short tasks, APIs	                                   Long-running services
-Pricing	                       Per execution time	                              Per CPU & memory usage
+---
 
+***************************************💻 Compute (VERY IMPORTANT)***************************************
 
-c) ECS: (Elastic Container Service)
+### Amazon EC2
 
+* Virtual servers with full control
+* 👉 *Example:* Hosting backend of e-commerce website
 
-d) Fargate
+### AWS Lambda
 
+* Runs code without servers (event-driven)
+* 👉 *Example:* Trigger function when file uploaded to S3
 
-e) EKS : (Elastic Kubernetes Service)
+### Amazon ECS / AWS Fargate
 
+* Run Docker containers
+* Fargate = no server management
+* 👉 *Example:* Run microservices in containers
 
-g) AWS Lamda
+### Amazon EKS
 
+* Managed Kubernetes
+* 👉 *Example:* Large-scale apps using Kubernetes clusters
 
-Storage:
+---
 
-a) EFS (Elastic File systems) 
-it can be use to multiple ec2 instances at a time
+***************************************🗄️ Storage (VERY IMPORTANT)***************************************
 
-b) EBS (Elastic Block Storage)
-it can be use one ec2instance at a time only
+### Amazon S3
 
-Config:
+* Stores files (images, videos, backups)
+* 👉 *Example:* Store product images of e-commerce site
 
-a) Secrets Manager
+### Amazon EBS
 
-b) AWS APP Config:
-consider this as an If statment --if road open go startight oreelsse take left
+* Attached to one EC2 (like hard disk)
+* 👉 *Example:* Store OS and app data for EC2 
 
-Databases:
+### Amazon EFS
 
-a) RDS (AWS Reletional database):
-MySQL
+* Shared across multiple EC2s
+* 👉 *Example:* Shared files between multiple servers which will be in sync (google drive)
 
-b) Aurora:
-this is also retional data base
-It additinally supports serverless varient DB , charged as per usage
+---
 
-c) DynamoDB: 
-it is no SQL DB
+***************************************🗃️ Databases (VERY IMPORTANT)***************************************
 
+### Amazon RDS
 
-d) Document DB (Mongo DB): 
+* Managed SQL DB
+* 👉 *Example:* Store user data (name, email, orders)
 
+### Amazon Aurora
 
-e) DMS (Data base migeration service)
-It is not a DB but it is used to migrate databases into AWS like you have some postgress DB then u can use DMS to mignraete it to AWS and then host that data to RDS DB.
+* Faster, scalable RDS
+* 👉 *Example:* High-traffic apps like banking systems
 
+### Amazon DynamoDB
 
-Caching: 
+* Key-value DB, ultra scalable
+* 👉 *Example:* Store session data or user activity
 
-a) EleasticCache:
-In this it will cache the data of you ec2 but if all your ec2 goes down then it again need to cache data from the DB which can slow the website loading process due to this MemoryDB came in picture
-It losses all state when the node goes down
+---
 
-b) MemoryDB
-It does not losses all state when the node goes down, it stores the data and when node comes up it caches the data back
+***************************************⚡ Caching (IMPORTANT)***************************************
 
+### Amazon ElastiCache
 
-Application Cordination:
+* Caches frequently accessed data
+* 👉 *Example:* Store product details for fast access
 
-a) SNS (Simple Notification Service): 
+### Amazon MemoryDB
 
-b) SQS (Simple Queing Service):
+* Durable cache (data persists)
+* 👉 *Example:* Real-time apps needing fast + persistent data
 
-c) Eventbridge: 
+---
 
-d) Step Functions:
+***************************************🔐 Authentication & Security***************************************
 
+### Amazon Cognito
 
-Data Processing and Analytics:
+* User login, signup, token generation
+* 👉 *Example:* Login with email/password or Google
 
-a) S3 
+### AWS Certificate Manager
 
-b) EMR (Eleastic mass reduce):
-it can do anyaliss of data from s3
-in this we process the data and we need to put it back some were may be s3
+* Enables HTTPS
+* 👉 *Example:* Secure website (https://)
 
-c) Athena: 
-In athena it will direclty read off the data from s3 fror anayasit and it doesnt need to be put back somewhere
+---
 
+***************************************🔄 Application Integration***************************************
 
-d) Glue:
-it is used in regular data engineering
+### Amazon SQS
 
+* Message queue (decoupling)
+* 👉 *Example:* Order placed → sent to queue → processed later
 
-Montering and Logging:
+### Amazon SNS
 
-a) CloudWatch:
-display logs, read logs , craete alarams
+* Push notifications / alerts
+* 👉 *Example:* Send SMS/email for order confirmation
 
-b) Cloud Trail:
-Audit log of users of AWS
+### AWS Step Functions
 
-c) AWS Config: 
-For example for every s3 bucket created i want public access disable the here we can create a policy in aws config and when user does so it will raise and alarm and tell the user about it 
+* Automates workflows
+* 👉 *Example:* Order → payment → shipping → notification
 
-d) X-ray
-traces of application logs to do debugging
+---
 
+***************************************📊 Monitoring & Logging***************************************
 
-CI/CD:
+### Amazon CloudWatch
 
-a) CodeBulid:
+* Logs, metrics, alarms
+* 👉 *Example:* Alert if CPU > 80%
 
-b)CodeDeploy:
+### AWS CloudTrail
 
-c) CodePipeline
+* Tracks user actions
+* 👉 *Example:* Who deleted an S3 bucket
+
+---
+
+***************************************🚀 CI/CD***************************************
+
+### AWS CodePipeline
+
+* Automates build → test → deploy
+
+### AWS CodeBuild
+
+* Builds code
+
+### AWS CodeDeploy
+
+* Deploys app updates
+
+👉 *Example:* Push code → automatically deployed to EC2
+
+---
+
+## 🎯 Final Flow (Say This in Interview)
+
+👉 **“User request flows like this:”**
+**Route53 → CloudFront → WAF/Shield → Load Balancer/API Gateway → EC2/Lambda → Cache → Database → S3**
+
 
 
 infrasturcture as code:
